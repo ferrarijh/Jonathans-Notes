@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:gravity="center_vertical"
+
+    android:clickable="true"
+    android:background="?attr/selectableItemBackground">
+    <ImageView
+        android:id="@+id/iv_drawer_item"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:scaleX="0.4"
+        android:scaleY="0.4"
+        android:src="@drawable/trash"/>
+    <TextView
+        android:id="@+id/tv_drawer_item"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:layout_weight="1"
+        android:textColor="@color/colorAccent"
+        android:fontFamily="@font/paybooc_bold"
+        android:text="test"
+        android:textSize="20sp"/>
+
+</LinearLayout>
