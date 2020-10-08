@@ -103,7 +103,6 @@ class HomeFragment : Fragment() {
             requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
             when(it.itemId){
                 R.id.item_private_note -> {
-                    Toast.makeText(context, "private!", Toast.LENGTH_SHORT).show()
                     val action = HomeFragmentDirections.actionHomeFragmentToPrivateFragment()
                     findNavController().navigate(action)
                 }

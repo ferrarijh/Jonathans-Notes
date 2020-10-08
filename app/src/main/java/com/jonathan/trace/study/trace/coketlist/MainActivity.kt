@@ -88,20 +88,15 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val toast = Toast.makeText(this, "", Toast.LENGTH_SHORT)
         when(item.itemId){
             R.id.action_search -> {
-                toast.setText("selected search item!")
                 val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment()
                 navController.navigate(action)
             }
             R.id.action_sort -> {
-                toast.setText("selected sort item!")
                 sortDialog.show()
             }
-            else -> toast.setText("not working :(")
         }
-        toast.show()
 
         return super.onOptionsItemSelected(item)
     }
