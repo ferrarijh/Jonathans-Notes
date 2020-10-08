@@ -22,25 +22,26 @@
             android:orientation="vertical"
             android:elevation="1dp">
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:gravity="center_vertical"
-                    android:background="@color/background"
-                    app:layout_scrollFlags="scroll|enterAlways"
-                    app:contentInsetStart="0dp">
-                    <ImageView
-                        android:id="@+id/iv_hamburger"
-                        android:layout_width="?attr/actionBarSize"
-                        android:layout_height="match_parent"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:scaleX="0.8"
-                        android:scaleY="0.8"
-                        android:src="@drawable/hamburger" />
-
-                </androidx.appcompat.widget.Toolbar>
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:gravity="center_vertical"
+                android:background="@color/background"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:contentInsetStart="0dp">
+                <!--
+                <ImageView
+                    android:id="@+id/iv_hamburger"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:src="@drawable/hamburger" />
+                    -->
+            </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -84,13 +85,13 @@
         android:background="@color/background">
 
 
-<!--
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fcv_drawer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:name="com.jonathan.trace.study.trace.coketlist.DrawerFragment"/>
--->
+        <!--
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/fcv_drawer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:name="com.jonathan.trace.study.trace.coketlist.DrawerFragment"/>
+        -->
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

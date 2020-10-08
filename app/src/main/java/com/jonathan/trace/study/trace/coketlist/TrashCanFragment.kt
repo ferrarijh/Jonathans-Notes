@@ -1,15 +1,14 @@
 package com.jonathan.trace.study.trace.coketlist
 
+import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -29,19 +28,24 @@ class TrashCanFragment : Fragment() {
     private lateinit var notes: LiveData<List<Note>>
     private lateinit var adapter: ThumbnailTrashAdapter
     private lateinit var warnDialog: MyDialog
+    private lateinit var warnClearDialog: AlertDialog
     private lateinit var selectDialog: AlertDialog
     private var selectedNote: Note? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_trash_can, container, false)
+    ): View?{
+        setHasOptionsMenu(true)
+        return inflater.inflate(R.layout.fragment_trash_can, container, false)
+    }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         mViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
-        notes = mViewModel.getAllTrashNotes()
+        setNotes()
         setDialog()
         setAdapter()
         setFAB()
@@ -49,6 +53,21 @@ class TrashCanFragment : Fragment() {
         setOnBackPressed()
         setDrawer()
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
+        inflater.inflate(R.menu.menu_trash_can, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        warnClearDialog.show()
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun setNotes(){
+        notes = mViewModel.getAllTrashNotes()
         notes.observe(viewLifecycleOwner){
             adapter.updateList(it)
         }
@@ -66,8 +85,14 @@ class TrashCanFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setAppBar(){
-        (requireActivity() as AppCompatActivity).supportActionBar!!.hide()
+        val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolBar.setNavigationIcon(R.drawable.back)
+        toolBar.setNavigationOnClickListener{
+            val action = TrashCanFragmentDirections.actionTrashCanFragmentToHomeFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private fun setFAB(){
@@ -98,6 +123,14 @@ class TrashCanFragment : Fragment() {
             }
         }
         selectDialog = builder.create()
+
+        val builderClear = AlertDialog.Builder(requireContext())
+        builderClear.setTitle(getString(R.string.warn_clear_all))
+            .setPositiveButton("OK"){ _, _ ->
+                mViewModel.deleteAll()
+                Toast.makeText(context, "All trashed notes deleted.", Toast.LENGTH_SHORT).show()
+            }
+        warnClearDialog = builderClear.create()
     }
 
     private fun deleteNote(){

@@ -21,43 +21,24 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
-    private lateinit var sortDialog: AlertDialog
     private lateinit var mViewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        /*
         iv_hamburger.setOnClickListener {
             layout_drawer.openDrawer(GravityCompat.START)
         }
 
+         */
+
         mViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
         setFAB()
-        mSetSupportActionBar()
-        setDialog()
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_nav_host) as NavHostFragment
         navController = navHostFragment.navController
-    }
-
-    private fun setDialog() {
-        val sortTitle = getString(R.string.sort_by_title)
-        val sortBody = getString(R.string.sort_by_body)
-        val sortCreated = getString(R.string.sort_by_time_created)
-        val sortModified = getString(R.string.sort_by_time_modified)
-
-        val sortSel = arrayOf(sortModified, sortCreated, sortTitle, sortBody)
-        val builderSort = AlertDialog.Builder(this)
-        builderSort.setItems(sortSel) { _, i ->
-            when (sortSel[i]) {
-                sortModified -> mViewModel.sortState.value = NoteViewModel.SortState.MODIFIED
-                sortCreated -> mViewModel.sortState.value = NoteViewModel.SortState.CREATED
-                sortTitle -> mViewModel.sortState.value = NoteViewModel.SortState.TITLE
-                sortBody -> mViewModel.sortState.value = NoteViewModel.SortState.BODY
-            }
-        }
-        sortDialog = builderSort.create()
     }
 
     private fun setFAB(){
@@ -68,16 +49,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun mSetSupportActionBar(){
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowTitleEnabled(false)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_actions, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
 
     override fun onBackPressed() {
         if (layout_drawer.isDrawerOpen(GravityCompat.START))
@@ -86,18 +57,4 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
     }
 
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.action_search -> {
-                val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment()
-                navController.navigate(action)
-            }
-            R.id.action_sort -> {
-                sortDialog.show()
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
 }

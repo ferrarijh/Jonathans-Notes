@@ -4,15 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -32,11 +31,12 @@ import kotlinx.android.synthetic.main.fragment_home.*
 class HomeFragment : Fragment() {
 
     private lateinit var mViewModel: NoteViewModel
+    private lateinit var sharedSortState: LiveData<NoteViewModel.SortState>
     private lateinit var notes: LiveData<List<Note>>
     private lateinit var adapter: ThumbnailAdapter
     private lateinit var warnDialog: MyDialog
     private lateinit var selectDialog: AlertDialog
-    private lateinit var sharedSortState: LiveData<NoteViewModel.SortState>
+    private lateinit var sortDialog: AlertDialog
     private lateinit var pwDialog: AlertDialog
     private var selectedNote: Note? = null
 
@@ -48,7 +48,10 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_home, container, false)
+    ): View?{
+        setHasOptionsMenu(true)
+        return inflater.inflate(R.layout.fragment_home, container, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -92,6 +95,25 @@ class HomeFragment : Fragment() {
         Log.d("", "HomeFragment onViewCreated() - sortState: ${sharedSortState.value}")
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_actions, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.action_search -> {
+                val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment()
+                findNavController().navigate(action)
+            }
+            R.id.action_sort -> {
+                sortDialog.show()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun setDrawer(){
         val drawer = requireActivity().findViewById<DrawerLayout>(R.id.layout_drawer)
         if(drawer.getDrawerLockMode(GravityCompat.START) == DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
@@ -123,7 +145,19 @@ class HomeFragment : Fragment() {
     }
 
     private fun setAppBar(){
-        (requireActivity() as AppCompatActivity).supportActionBar!!.show()
+        val parent = requireActivity() as AppCompatActivity
+        val toolBar = parent.findViewById<Toolbar>(R.id.toolbar)
+        toolBar.setContentInsetsAbsolute(0, 0)
+        parent.setSupportActionBar(toolBar)
+        parent.supportActionBar!!.show()
+        parent.supportActionBar!!.setDisplayShowTitleEnabled(false)
+
+
+        toolBar.setNavigationIcon(R.mipmap.ic_hamburger_foreground)
+        toolBar.setNavigationOnClickListener {
+            val drawer = parent.findViewById<DrawerLayout>(R.id.layout_drawer)
+            drawer.openDrawer(GravityCompat.START)
+        }
     }
 
     private fun setFAB(){
@@ -180,6 +214,22 @@ class HomeFragment : Fragment() {
         }
         selectDialog = builderSel.create()
 
+        val sortTitle = getString(R.string.sort_by_title)
+        val sortBody = getString(R.string.sort_by_body)
+        val sortCreated = getString(R.string.sort_by_time_created)
+        val sortModified = getString(R.string.sort_by_time_modified)
+
+        val sortSel = arrayOf(sortModified, sortCreated, sortTitle, sortBody)
+        val builderSort = AlertDialog.Builder(requireContext())
+        builderSort.setItems(sortSel) { _, i ->
+            when (sortSel[i]) {
+                sortModified -> mViewModel.sortState.value = NoteViewModel.SortState.MODIFIED
+                sortCreated -> mViewModel.sortState.value = NoteViewModel.SortState.CREATED
+                sortTitle -> mViewModel.sortState.value = NoteViewModel.SortState.TITLE
+                sortBody -> mViewModel.sortState.value = NoteViewModel.SortState.BODY
+            }
+        }
+        sortDialog = builderSort.create()
     }
 
     private fun warnDeletion(){

@@ -2,6 +2,7 @@ package com.jonathan.trace.study.trace.coketlist.room
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -55,6 +56,12 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
     fun delete(note: Note){
         viewModelScope.launch(Dispatchers.IO) {
             repository.delete(note)
+        }
+    }
+
+    fun deleteAll(){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.deleteAll()
         }
     }
 

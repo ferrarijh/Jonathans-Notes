@@ -37,4 +37,6 @@ interface NoteDao{
     @Delete
     fun delete(entity: Note)
 
+    @Query("DELETE FROM note_table WHERE trash = 1")
+    fun deleteAll()
 }

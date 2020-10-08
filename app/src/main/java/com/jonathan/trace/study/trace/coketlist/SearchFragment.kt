@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -56,8 +57,15 @@ class SearchFragment: Fragment(){
     }
 
     private fun setOtherUI(){
-        requireActivity().findViewById<FloatingActionButton>(R.id.fab_add).hide()
-        (requireActivity() as AppCompatActivity).supportActionBar!!.hide()
+        val parent = requireActivity()
+        parent.findViewById<FloatingActionButton>(R.id.fab_add).hide()
+        (parent as AppCompatActivity).supportActionBar!!.hide()
+
+        val back = parent.findViewById<ImageView>(R.id.iv_back)
+        back.setOnClickListener{
+            val action = SearchFragmentDirections.actionSearchFragmentToHomeFragment()
+            findNavController().navigate(action)
+        }
 
         setDrawer()
     }

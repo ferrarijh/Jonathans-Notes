@@ -1,16 +1,16 @@
 package com.jonathan.trace.study.trace.coketlist
 
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.activity.addCallback
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -27,27 +27,40 @@ class PrivateFragment: Fragment(){
     private lateinit var mViewModel: NoteViewModel
     private lateinit var notes: LiveData<List<Note>>
     private lateinit var adapter: ThumbnailPrivateAdapter
-    private lateinit var warnDialog: MyDialog
+    private lateinit var warnDeleteDialog: MyDialog
     private lateinit var pwDialog: AlertDialog
     private var selectedNote: Note? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_private, container, false)
+    ): View?{
+        setHasOptionsMenu(true)
+        return inflater.inflate(R.layout.fragment_private, container, false)
+    }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         mViewModel = ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)
-        notes = mViewModel.getAllPrivateNotes()
+        setNotes()
         setDialog()
         setAdapter()
         setFAB()
-        setAppBar()
         setOnBackPressed()
         setDrawer()
+        setAppBar()
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
+    }
+
+    private fun setNotes(){
+        notes = mViewModel.getAllPrivateNotes()
         notes.observe(viewLifecycleOwner){
             adapter.updateList(it)
         }
@@ -65,8 +78,14 @@ class PrivateFragment: Fragment(){
         }
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setAppBar(){
-        (requireActivity() as AppCompatActivity).supportActionBar!!.hide()
+        val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolBar.setNavigationIcon(R.drawable.back)
+        toolBar.setNavigationOnClickListener{
+            findNavController().navigate(PrivateFragmentDirections.actionPrivateFragmentToHomeFragment())
+        }
     }
 
     private fun setFAB(){
@@ -77,12 +96,12 @@ class PrivateFragment: Fragment(){
     }
 
     private fun setDialog(){
-        warnDialog = MyDialog(requireContext()){  //pClickListener
+        warnDeleteDialog = MyDialog(requireContext()){  //pClickListener
             selectedNote?.let {
                 mViewModel.delete(it)
                 Toast.makeText(context, "Note deleted.", Toast.LENGTH_SHORT).show()
             }
-            warnDialog.dismiss()
+            warnDeleteDialog.dismiss()
         }
 
         val builderPw = AlertDialog.Builder(requireContext())
@@ -118,12 +137,13 @@ class PrivateFragment: Fragment(){
             object: ThumbnailPrivateAdapter.ThumbnailAdapterLongListener{
                 override fun <T> onLongClickItem(item: T) {
                     selectedNote = item as Note
-                    warnDialog.show()
-                    warnDialog.findViewById<TextView>(R.id.tv_dialog_title).text = getString(R.string.warn_deletion_permanent_private)
+                    warnDeleteDialog.show()
+                    warnDeleteDialog.findViewById<TextView>(R.id.tv_dialog_title).text = getString(R.string.warn_deletion_permanent_private)
                 }
             })
 
         rv_notes_private.adapter = adapter
         rv_notes_private.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
     }
+
 }
