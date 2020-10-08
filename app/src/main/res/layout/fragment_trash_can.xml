@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools">
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_drawer"
-        android:orientation="vertical"
+        android:id="@+id/rv_notes_trash"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="50dp"
-        tools:listitem="@layout/views_for_drawer_recycler"/>
+        android:layout_margin="20dp"
+        tools:listitem="@layout/thumbnail_trash" />
 
-</FrameLayout>
+</LinearLayout>

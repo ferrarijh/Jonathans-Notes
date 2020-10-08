@@ -3,6 +3,8 @@
     <string name="login">로그인</string>
     <string name="sign_up"><u>계정 만들기</u></string>
 
+    <string name="shakespeare">William Shakespeare (bapt. 26 April 1564 – 23 April 1616)[a] was an English playwright, poet, and actor, widely regarded as the greatest writer in the English language and the world\'s greatest dramatist.[2][3][4] He is often called England\'s national poet and the "Bard of Avon" (or simply "the Bard").[5][b] His extant works, including collaborations, consist of some 39 plays,[c] 154 sonnets, two long narrative poems, and a few other verses, some of uncertain authorship. His plays have been translated into every major living language and are performed more often than those of any other playwright.[7] They also continue to be studied and reinterpreted.</string>
+
     <!-- RegisterActivity -->
     <string name="welcome">환영합니다 :)</string>
     <string name="welcome_content"></string>
@@ -21,4 +23,23 @@
     <string name="lock">비밀 노트</string>
     <string name="trashcan">휴지통</string>
     <string name="settings">설정</string>
+
+    <!-- dialog -->
+    <string name="warn_deletion_permanent_private">비밀 노트는 즉시 삭제됩니다.\n정말 삭제하나요?</string>
+    <string name="warn_deletion_permanent">노트를 영구히 삭제하나요?</string>
+    <string name="warn_deletion">노트를 삭제하나요?</string>
+    <string name="warn_cancel_edit">편집을 취소하나요?</string>
+    <string name="ok">네</string>
+    <string name="cancel">아니요</string>
+
+    <string name="permanent_deletion">영구 삭제</string>
+    <string name="recover">복원</string>
+
+    <string name="delete">삭제</string>
+    <string name="set_pw">비밀번호 설정</string>
+
+    <string name="sort_by_time_created">생성일자 기준</string>
+    <string name="sort_by_time_modified">마지막 수정일 기준</string>
+    <string name="sort_by_title">제목 기준</string>
+    <string name="sort_by_body">내용 기준</string>
 </resources>

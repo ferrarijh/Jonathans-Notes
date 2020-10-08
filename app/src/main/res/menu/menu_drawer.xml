@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/item_private_note"
+        android:title="@string/lock"
+        android:icon="@drawable/mylock"
+        android:iconTint="@color/dark"/>
+    <item
+        android:id="@+id/item_trash_can"
+        android:title="@string/trashcan"
+        android:icon="@drawable/trash"
+        android:iconTint="@color/dark"/>
+</menu>

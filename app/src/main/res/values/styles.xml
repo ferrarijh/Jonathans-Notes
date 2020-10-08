@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionButtonStyle">@style/myActionButtonStyle</item>
         <item name="android:actionButtonStyle">@style/myActionButtonStyle</item>
+        <item name="fontFamily">@font/paybooc_medium</item>
     </style>
 
     <style name="myActionButtonStyle">

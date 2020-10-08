@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#BC8C8C</color>
-    <color name="colorPrimaryDark">#977171</color>
-    <color name="colorAccent">#a69b9b</color>
+    <color name="colorPrimary">#D3AFAF</color>
+    <color name="colorPrimaryDark">#A38383</color>
+    <color name="colorAccent">#916767</color>
     <color name="background">#E3E1DC</color>
+    <color name="dateText">#C3C1BC</color>
+    <color name="dark">#504B4B</color>
+    <color name="trashedText">#888888</color>
 </resources>
