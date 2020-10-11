@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.InputType
 import android.view.*
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -39,7 +40,6 @@ class PrivateFragment: Fragment(){
         return inflater.inflate(R.layout.fragment_private, container, false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -47,7 +47,6 @@ class PrivateFragment: Fragment(){
         setNotes()
         setDialog()
         setAdapter()
-        setFAB()
         setOnBackPressed()
         setDrawer()
         setAppBar()
@@ -78,21 +77,14 @@ class PrivateFragment: Fragment(){
         }
     }
 
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setAppBar(){
+        requireActivity().findViewById<ImageView>(R.id.iv_hamburger).setImageResource(android.R.color.transparent)
         val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
         toolBar.setNavigationIcon(R.drawable.back)
+        toolBar.navigationIcon?.setTint(resources.getColor(R.color.icons))
         toolBar.setNavigationOnClickListener{
             findNavController().navigate(PrivateFragmentDirections.actionPrivateFragmentToHomeFragment())
         }
-    }
-
-    private fun setFAB(){
-        val fabAdd = requireActivity().findViewById<FloatingActionButton>(R.id.fab_add)
-        val fabSave = requireActivity().findViewById<FloatingActionButton>(R.id.fab_save)
-        fabAdd.hide()
-        fabSave.hide()
     }
 
     private fun setDialog(){

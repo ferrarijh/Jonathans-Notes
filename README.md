@@ -63,3 +63,39 @@ https://developer.android.com/jetpack/guide?hl=ko
 
 ## ViewModel
 * properties - LiveData objects which views will observe. 
+
+### Extra
+* parent.supportActionBar is lost after rotation so set it back like below:
+```kotlin
+    val parent = requireActivity() as AppCompatActivity
+    parent.supportActionBar = parent.findViewById<Toolbar>(R.id.my_toolbar)
+    supportActionBar?.apply{
+        doSomething()
+    }
+```
+
+* Change visibility by ```fab.hide()```, NOT ```fab.visibility = View.INVISIBLE```. (Latter is buggy)
+
+* To customize Dialog,
+1) set layout_gravity in xml for position.
+2) to set margin do below. (10% here)
+```kotlin
+        window?.apply {
+            setBackgroundDrawableResource(android.R.color.transparent)
+            val newX = context.resources.displayMetrics.widthPixels     //screen pixel
+            val newY = context.resources.displayMetrics.heightPixels
+            setLayout((newX*0.9).toInt(), (newY*0.9).toInt())
+            Log.d("", "layout: $newX, $newY")
+        }
+```
+3) to adjust 'parent view'(window) dimension do below.
+```kotlin
+        val lp = window?.attributes
+        lp?.apply{
+            flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND
+            dimAmount = 0.8f
+            width = WindowManager.LayoutParams.MATCH_PARENT
+            height = WindowManager.LayoutParams.MATCH_PARENT
+        }
+```
+By default window is whole screen for app. (area except notification bar and bottom bar)

@@ -20,7 +20,6 @@ abstract class NoteDatabase: RoomDatabase(){
                 database.execSQL("ALTER TABLE note_table ADD COLUMN pw VARCHAR")
             }
         }
-
  */
 
         fun getDatabase(context: Context): NoteDatabase {

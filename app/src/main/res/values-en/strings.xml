@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Coketlist</string>
+    <string name="login">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="welcome">Welcome :)</string>
+    <string name="name">Name</string>
+    <string name="email">E-mail</string>
+    <string name="pw">Password</string>
+    <string name="pw_confirm">Password Confirm</string>
+    <string name="done">Submit</string>
+    <string name="sort">Sort</string>
+    <string name="search">Search</string>
+    <string name="lock">Private Note</string>
+    <string name="trashcan">Trash Can</string>
+    <string name="settings">Settings</string>
+    <string name="warn_deletion_permanent_private">Private notes are deleted immediately.\\nSure you want to delete?</string>
+    <string name="warn_deletion_permanent">Permanently delete note?</string>
+    <string name="warn_clear_all">Empty trash can?</string>
+    <string name="warn_deletion">Delete note?</string>
+    <string name="warn_cancel_edit">Cancel edit?</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="permanent_deletion">Premanent delete</string>
+    <string name="recover">Recover</string>
+    <string name="delete">Delete</string>
+    <string name="set_pw">Set Password</string>
+    <string name="sort_by_time_created">by Time Created</string>
+    <string name="sort_by_time_modified">by Last Time Modified</string>
+    <string name="sort_by_title">by Title</string>
+    <string name="sort_by_body">by Body</string>
+    <string name="sort_by_color">by Background Color</string>
+    <string name="long_click">Long press to save and exit</string>
+    <string name="saved">Saved!</string>
+    <string name="moved_to_trash">Note moved to trash can</string>
+    <string name="deleted">Deleted</string>
+    <string name="title_and_body">Can\'t save with empty title or body</string>
+</resources>

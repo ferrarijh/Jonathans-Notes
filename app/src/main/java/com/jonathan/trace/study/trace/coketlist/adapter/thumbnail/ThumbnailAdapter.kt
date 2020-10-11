@@ -1,9 +1,11 @@
 package com.jonathan.trace.study.trace.coketlist.adapter.thumbnail
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jonathan.trace.study.trace.coketlist.R
@@ -38,16 +40,21 @@ class ThumbnailAdapter(
             holder.itemView.tv_thumbnail_date.text = note.dateTimeModified.substring(11)
         else
             holder.itemView.tv_thumbnail_date.text = noteDate
-        holder.itemView.tv_thumbnail_title.text = note.title
-        holder.itemView.tv_thumbnail_body.text = note.body
 
-        holder.itemView.setOnClickListener{
-            listener.onClickItem(note)
-        }
+        val cv = holder.itemView.findViewById<CardView>(R.id.cv_thumbnail)
+        cv.setBackgroundColor(Color.parseColor(note.color))
 
-        holder.itemView.setOnLongClickListener{
-            longListener.onLongClickItem(note)
-            true
+        holder.itemView.apply{
+            tv_thumbnail_title.text = note.title
+            tv_thumbnail_body.text = note.body
+            setOnClickListener{
+                listener.onClickItem(note)
+            }
+            setOnLongClickListener{
+                longListener.onLongClickItem(note)
+                true
+            }
+
         }
 
     }
@@ -65,6 +72,7 @@ class ThumbnailAdapter(
     }
 
     fun updateList(newList: List<Note>) {
+        Log.d("", "newList.size: ${newList.size}")
         val callback = ListDiffCallback(thumbnails, newList)
         var diffResult : DiffUtil.DiffResult? = null
         CoroutineScope(Dispatchers.Default).launch {
@@ -73,6 +81,7 @@ class ThumbnailAdapter(
             CoroutineScope(Dispatchers.Main).launch{
                 thumbnails.clear()
                 thumbnails.addAll(newList)
+                Log.d("","in invokeOncompletion, thumbnails.size: ${thumbnails.size}")
                 diffResult?.dispatchUpdatesTo(this@ThumbnailAdapter)
             }
         }

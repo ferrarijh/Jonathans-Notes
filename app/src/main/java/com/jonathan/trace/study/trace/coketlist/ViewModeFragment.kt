@@ -5,10 +5,13 @@ import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.appcompat.widget.Toolbar
 import androidx.activity.addCallback
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_view_only.*
 
 class ViewModeFragment : Fragment(){
@@ -28,6 +31,16 @@ class ViewModeFragment : Fragment(){
         tv_note_body.movementMethod = ScrollingMovementMethod()
         setOnBackPressed()
         setDrawer()
+        setAppBar()
+    }
+
+    private fun setAppBar(){
+        requireActivity().findViewById<ImageView>(R.id.iv_hamburger).setImageResource(android.R.color.transparent)
+        val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        toolBar.setNavigationOnClickListener{
+            val action = ViewModeFragmentDirections.actionViewModeFragmentToTrashCanFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private fun setDrawer(){

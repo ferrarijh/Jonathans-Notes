@@ -29,9 +29,10 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
     fun getAllNotesByCreated() = repository.getAllNotesByCreated()
     fun getAllNotesByTitle() = repository.getAllNotesByTitle()
     fun getAllNotesByBody() = repository.getAllNotesByBody()
+    fun getAllNotesByColor() = repository.getAllNotesByColor()
 
+    enum class SortState{ MODIFIED, CREATED, TITLE, BODY, COLOR}
     val sortState = MutableLiveData<SortState>(SortState.MODIFIED)
-
 
     init{
         val noteDao = NoteDatabase.getDatabase(app).getNoteDao()
@@ -71,5 +72,4 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
         }
     }
 
-    enum class SortState{ MODIFIED, CREATED, TITLE, BODY}
 }

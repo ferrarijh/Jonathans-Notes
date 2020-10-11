@@ -1,13 +1,11 @@
 package com.jonathan.trace.study.trace.coketlist
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
-import android.text.InputType
 import android.util.Log
 import android.view.*
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +15,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -24,14 +23,15 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailAdapter
+import com.jonathan.trace.study.trace.coketlist.cache.NotesCache
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
+import kotlinx.android.synthetic.main.dialog.*
 import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment() {
 
     private lateinit var mViewModel: NoteViewModel
-    private lateinit var sharedSortState: LiveData<NoteViewModel.SortState>
     private lateinit var notes: LiveData<List<Note>>
     private lateinit var adapter: ThumbnailAdapter
     private lateinit var warnDialog: MyDialog
@@ -39,6 +39,8 @@ class HomeFragment : Fragment() {
     private lateinit var sortDialog: AlertDialog
     private lateinit var pwDialog: AlertDialog
     private var selectedNote: Note? = null
+
+    private lateinit var fabAdd: FloatingActionButton
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -56,43 +58,15 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /*
-        rv_notes.setOnTouchListener{ _, _ ->
-            Log.d("", "mViewModel.getAllNotes.value.size: ${mViewModel.getAllNotes.value!!.size}")
-            Log.d("", "mViewModel.getAllNotesByCreated.value.size: ${mViewModel.getAllNotesByCreated.value!!.size}")
-            Log.d("", "mViewModel.getAllNotesByTitle.value.size: ${mViewModel.getAllNotesByTitle.value!!.size}")
-            Log.d("", "mViewModel.getAllNotesByBody.value.size: ${mViewModel.getAllNotesByBody.value!!.size}")
-            Log.d("", "mVIewModel.sortState: ${mViewModel.sortState.value}")
-            Log.d("", "adapter data size: ${adapter.thumbnailsVisible.size}")
-            true
-        }
-
-         */
-
-        mViewModel = ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)
-        sharedSortState = mViewModel.sortState
-        notes = mViewModel.getAllNotes()
-        setDialog()
+        mViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
+        setNotes()
         setAdapter()
+        setDialog()
         setFAB()
         setAppBar()
         setNavView()
         setDrawer()
 
-        sharedSortState.observe(viewLifecycleOwner){
-            Log.d("", "sortState observed: $it")
-            notes = when(it){
-                NoteViewModel.SortState.MODIFIED -> mViewModel.getAllNotes()
-                NoteViewModel.SortState.CREATED -> mViewModel.getAllNotesByCreated()
-                NoteViewModel.SortState.TITLE -> mViewModel.getAllNotesByTitle()
-                NoteViewModel.SortState.BODY -> mViewModel.getAllNotesByBody()
-            }
-            notes.observe(viewLifecycleOwner){ lis ->
-                adapter.updateList(lis)
-            }
-        }
-
-        Log.d("", "HomeFragment onViewCreated() - sortState: ${sharedSortState.value}")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -103,6 +77,8 @@ class HomeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_search -> {
+                fabAdd.hide()
+
                 val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment()
                 findNavController().navigate(action)
             }
@@ -112,6 +88,26 @@ class HomeFragment : Fragment() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        NotesCache.notes?.value?.apply{
+            clear()
+            addAll(notes.value!!)
+        }
+    }
+
+    private fun setNotes(){
+        NotesCache.notes?.let {
+            notes = it as LiveData<List<Note>>
+            return
+        }
+        notes = mViewModel.getAllNotes()
+
+        notes.observe(viewLifecycleOwner){
+            adapter.updateList(it)
+        }
     }
 
     private fun setDrawer(){
@@ -125,10 +121,14 @@ class HomeFragment : Fragment() {
             requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
             when(it.itemId){
                 R.id.item_private_note -> {
+                    fabAdd.hide()
+
                     val action = HomeFragmentDirections.actionHomeFragmentToPrivateFragment()
                     findNavController().navigate(action)
                 }
                 R.id.item_trash_can -> {
+                    fabAdd.hide()
+
                     val action = HomeFragmentDirections.actionHomeFragmentToTrashCanFragment()
                     findNavController().navigate(action)
                 }
@@ -147,25 +147,35 @@ class HomeFragment : Fragment() {
     private fun setAppBar(){
         val parent = requireActivity() as AppCompatActivity
         val toolBar = parent.findViewById<Toolbar>(R.id.toolbar)
-        toolBar.setContentInsetsAbsolute(0, 0)
-        parent.setSupportActionBar(toolBar)
-        parent.supportActionBar!!.show()
-        parent.supportActionBar!!.setDisplayShowTitleEnabled(false)
-
-
-        toolBar.setNavigationIcon(R.mipmap.ic_hamburger_foreground)
-        toolBar.setNavigationOnClickListener {
-            val drawer = parent.findViewById<DrawerLayout>(R.id.layout_drawer)
-            drawer.openDrawer(GravityCompat.START)
+        val ivHome = toolBar.findViewById<ImageView>(R.id.iv_hamburger)
+        ivHome.apply {
+            setImageResource(R.drawable.hamburger)
+            setOnClickListener{
+                val drawer = parent.findViewById<DrawerLayout>(R.id.layout_drawer)
+                drawer.openDrawer(GravityCompat.START)
+            }
+        }
+        parent.apply {
+            setSupportActionBar(toolBar)
+            supportActionBar!!.apply{
+                setDisplayShowTitleEnabled(false)
+                setDisplayHomeAsUpEnabled(false)
+                show()
+            }
         }
     }
 
     private fun setFAB(){
-        val fabAdd = requireActivity().findViewById<FloatingActionButton>(R.id.fab_add)
-        val fabSave = requireActivity().findViewById<FloatingActionButton>(R.id.fab_save)
+        val parent = requireActivity()
 
+        fabAdd = parent.findViewById(R.id.fab_add)
         fabAdd.show()
-        fabSave.hide()
+
+        fabAdd.setOnClickListener{
+            fabAdd.hide()
+            val action = HomeFragmentDirections.actionHomeFragmentToEditNoteFragment()
+            findNavController().navigate(action)
+        }
 
         rv_notes.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -186,14 +196,35 @@ class HomeFragment : Fragment() {
             selectedNote?.let {
                 it.trash = 1
                 mViewModel.update(it)
-                Toast.makeText(context, "Note moved to trash can.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
             }
             warnDialog.dismiss()
         }
 
+        /*
+        val warnBuilder = AlertDialog.Builder(requireContext())
+        warnBuilder.setTitle(getString(R.string.warn_deletion))
+            .setPositiveButton(getString(R.string.ok)){_, _ ->
+                selectedNote?.let {
+                    it.trash = 1
+                    mViewModel.update(it)
+                    Toast.makeText(context, "Note moved to trash can.", Toast.LENGTH_SHORT).show()
+                }
+            }.setNegativeButton(getString(R.string.cancel)){_, _->}
+        warnDialog = warnBuilder.create()
+         */
+
         //selectDialog on longClick
         val etPw = EditText(context)
-        etPw.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        val lp = requireView().layoutParams as ViewGroup.MarginLayoutParams
+        lp.apply{
+            setMargins(15, 15, 15, 15)
+        }
+        lp.setMargins(20, 20, 20, 20)
+        lp.width = ViewGroup.MarginLayoutParams.MATCH_PARENT
+        lp.height = ViewGroup.MarginLayoutParams.WRAP_CONTENT
+
+        etPw.layoutParams = lp
         val builderPw = AlertDialog.Builder(requireContext())
         builderPw.setView(etPw)
             .setTitle(getString(R.string.pw))
@@ -218,15 +249,21 @@ class HomeFragment : Fragment() {
         val sortBody = getString(R.string.sort_by_body)
         val sortCreated = getString(R.string.sort_by_time_created)
         val sortModified = getString(R.string.sort_by_time_modified)
+        val sortColor = getString(R.string.sort_by_color)
 
-        val sortSel = arrayOf(sortModified, sortCreated, sortTitle, sortBody)
+        val sortSel = arrayOf(sortModified, sortCreated, sortTitle, sortBody, sortColor)
         val builderSort = AlertDialog.Builder(requireContext())
         builderSort.setItems(sortSel) { _, i ->
-            when (sortSel[i]) {
-                sortModified -> mViewModel.sortState.value = NoteViewModel.SortState.MODIFIED
-                sortCreated -> mViewModel.sortState.value = NoteViewModel.SortState.CREATED
-                sortTitle -> mViewModel.sortState.value = NoteViewModel.SortState.TITLE
-                sortBody -> mViewModel.sortState.value = NoteViewModel.SortState.BODY
+            notes = when (sortSel[i]) {
+                sortModified -> mViewModel.getAllNotes()
+                sortCreated -> mViewModel.getAllNotesByCreated()
+                sortTitle -> mViewModel.getAllNotesByTitle()
+                sortBody -> mViewModel.getAllNotesByBody()
+                sortColor -> mViewModel.getAllNotesByColor()
+                else -> mViewModel.getAllNotes()
+            }
+            notes.observe(viewLifecycleOwner){
+                adapter.updateList(it)
             }
         }
         sortDialog = builderSort.create()
@@ -239,10 +276,6 @@ class HomeFragment : Fragment() {
 
     private fun setPw(s: String){
         selectedNote!!.pw = s
-        /*
-        Note(selectedNote!!.id, selectedNote!!.title, selectedNote!!.body, selectedNote!!.dateTimeCreated
-            , selectedNote!!.dateTimeModified, selectedNote!!.trash, selectedNote!!.color, s)
-         */
         mViewModel.update(selectedNote!!)
         Toast.makeText(context, "Password set.", Toast.LENGTH_SHORT).show()
     }
@@ -254,9 +287,10 @@ class HomeFragment : Fragment() {
                 override fun <T> onClickItem(item: T) {
                     requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
 
+                    fabAdd.hide()
+
                     val action = HomeFragmentDirections.actionHomeFragmentToEditNoteFragment()
                     action.note = item as Note
-
                     findNavController().navigate(action)
                 }
             },
@@ -268,7 +302,11 @@ class HomeFragment : Fragment() {
             })
 
         rv_notes.adapter = adapter
-        rv_notes.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        val ori = requireActivity().resources.configuration.orientation
+        if(ori == Configuration.ORIENTATION_LANDSCAPE)
+            rv_notes.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+        else if (ori == Configuration.ORIENTATION_PORTRAIT)
+            rv_notes.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
     }
 
 }

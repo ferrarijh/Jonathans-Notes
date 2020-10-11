@@ -15,8 +15,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginBottom="30dp"
         android:text="@string/welcome"
-        android:textSize="30sp"
-        android:fontFamily="@font/paybooc_medium"/>
+        android:textSize="30sp"/>
 
     <ImageView
         android:id="@+id/iv_register_memo"
@@ -36,7 +35,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
         android:text="@string/email"
-        android:fontFamily="@font/paybooc_medium"
         app:layout_constraintTop_toTopOf="@id/iv_register_memo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +58,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
         android:text="@string/name"
-        android:fontFamily="@font/paybooc_medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/et_register_email" />
 
@@ -82,7 +79,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
         android:text="@string/pw"
-        android:fontFamily="@font/paybooc_medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/et_register_name" />
 
@@ -106,8 +102,7 @@
         android:layout_marginLeft="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/et_register_pw"
-        android:text="@string/pw_confirm"
-        android:fontFamily="@font/paybooc_medium" />
+        android:text="@string/pw_confirm" />
 
     <EditText
         android:id="@+id/et_register_pw_confirm"
@@ -131,6 +126,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/btn_round"
-        android:text="@string/done"
-        android:fontFamily="@font/paybooc_medium" />
+        android:text="@string/done" />
 </androidx.constraintlayout.widget.ConstraintLayout>

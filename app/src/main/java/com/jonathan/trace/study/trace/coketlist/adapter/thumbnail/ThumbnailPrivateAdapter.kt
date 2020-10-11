@@ -1,9 +1,11 @@
 package com.jonathan.trace.study.trace.coketlist.adapter.thumbnail
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jonathan.trace.study.trace.coketlist.R
@@ -37,17 +39,20 @@ class ThumbnailPrivateAdapter(
             holder.itemView.tv_thumbnail_private_date.text = note.dateTimeModified.substring(11)
         else
             holder.itemView.tv_thumbnail_private_date.text = noteDate
-        holder.itemView.tv_thumbnail_private_title.text = note.title
 
-        holder.itemView.setOnClickListener{
-            listener.onClickItem(note)
+        val cv = holder.itemView.findViewById<CardView>(R.id.cv_thumbnail_private)
+        cv.setBackgroundColor(Color.parseColor(note.color))
+
+        holder.itemView.apply {
+            tv_thumbnail_private_title.text = note.title
+            setOnClickListener {
+                listener.onClickItem(note)
+            }
+            setOnLongClickListener {
+                longListener.onLongClickItem(note)
+                true
+            }
         }
-
-        holder.itemView.setOnLongClickListener{
-            longListener.onLongClickItem(note)
-            true
-        }
-
     }
 
     override fun getItemCount(): Int = thumbnails.size

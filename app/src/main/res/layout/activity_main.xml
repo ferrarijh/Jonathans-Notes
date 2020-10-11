@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:elevation="1dp">
+            app:elevation="0dp">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -30,7 +30,7 @@
                 android:background="@color/background"
                 app:layout_scrollFlags="scroll|enterAlways"
                 app:contentInsetStart="0dp">
-                <!--
+
                 <ImageView
                     android:id="@+id/iv_hamburger"
                     android:layout_width="?attr/actionBarSize"
@@ -40,7 +40,7 @@
                     android:scaleX="0.8"
                     android:scaleY="0.8"
                     android:src="@drawable/hamburger" />
-                    -->
+
             </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
@@ -61,7 +61,9 @@
             app:fabSize="normal"
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="10dp"
-            android:src="@drawable/ic_add" />
+            app:maxImageSize="32dp"
+            android:src="@drawable/ic_add"
+            android:visibility="invisible"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_save"
@@ -69,9 +71,64 @@
             android:layout_height="wrap_content"
             app:fabSize="mini"
             android:layout_gravity="bottom|center"
-            android:layout_margin="10dp"
-            android:src="@drawable/ic_done" />
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/ic_done"
+            android:visibility="invisible"/>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:layout_gravity="bottom|end">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_coral"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/coral"
+                app:fabSize="mini"
+                app:borderWidth="0dp"
+                android:visibility="invisible"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_lemon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/lemon"
+                app:fabSize="mini"
+                app:borderWidth="0dp"
+                android:visibility="invisible"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_mint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/mint"
+                app:fabSize="mini"
+                app:borderWidth="0dp"
+                android:visibility="invisible"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                app:fabSize="mini"
+                app:borderWidth="0dp"
+                android:visibility="invisible"/>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_colors"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/gradient_circle"
+                app:fabSize="mini"
+                android:backgroundTint="#FFFFFF"
+                app:maxImageSize="32dp"
+                app:borderWidth="0dp"
+                android:visibility="invisible"/>
+        </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -84,14 +141,7 @@
         app:headerLayout="@layout/header"
         android:background="@color/background">
 
-
-        <!--
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/fcv_drawer"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:name="com.jonathan.trace.study.trace.coketlist.DrawerFragment"/>
-        -->
     </com.google.android.material.navigation.NavigationView>
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

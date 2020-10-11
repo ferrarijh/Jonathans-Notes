@@ -1,13 +1,13 @@
 package com.jonathan.trace.study.trace.coketlist
 
-import android.os.Build
 import android.os.Bundle
 import android.view.*
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailTrashAdapter
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
@@ -40,7 +39,6 @@ class TrashCanFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_trash_can, container, false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -48,7 +46,6 @@ class TrashCanFragment : Fragment() {
         setNotes()
         setDialog()
         setAdapter()
-        setFAB()
         setAppBar()
         setOnBackPressed()
         setDrawer()
@@ -85,21 +82,20 @@ class TrashCanFragment : Fragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun setAppBar(){
-        val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+        val parent = requireActivity() as AppCompatActivity
+
+        parent.findViewById<ImageView>(R.id.iv_hamburger).setImageResource(android.R.color.transparent)
+
+        val toolBar = parent.findViewById<Toolbar>(R.id.toolbar)
+        parent.setSupportActionBar(toolBar)
         toolBar.setNavigationIcon(R.drawable.back)
+        toolBar.navigationIcon?.setTint(resources.getColor(R.color.icons))
         toolBar.setNavigationOnClickListener{
             val action = TrashCanFragmentDirections.actionTrashCanFragmentToHomeFragment()
             findNavController().navigate(action)
         }
-    }
-
-    private fun setFAB(){
-        val fabAdd = requireActivity().findViewById<FloatingActionButton>(R.id.fab_add)
-        val fabSave = requireActivity().findViewById<FloatingActionButton>(R.id.fab_save)
-        fabAdd.hide()
-        fabSave.hide()
+        parent.supportActionBar!!.setDisplayShowTitleEnabled(false)
     }
 
     private fun setDialog(){
@@ -112,13 +108,13 @@ class TrashCanFragment : Fragment() {
             warnDialog.dismiss()
         }
 
-        val permanentDeletion = getString(R.string.permanent_deletion)
+        val permaDel = getString(R.string.permanent_deletion)
         val recover = getString(R.string.recover)
-        val items = arrayOf(permanentDeletion, recover)
+        val items = arrayOf(permaDel, recover)
         val builder = AlertDialog.Builder(requireContext())
         builder.setItems(items){_, b ->
             when(items[b]){
-                permanentDeletion -> deleteNote()
+                permaDel -> deleteNote()
                 recover -> recoverNote()
             }
         }

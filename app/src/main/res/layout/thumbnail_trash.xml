@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cv_thumbnail_trash"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
@@ -13,19 +14,10 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <!--
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:maxHeight="0dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/gradient"/>
-                -->
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_gravity="bottom | end"
+                android:layout_gravity="bottom|end"
                 android:paddingRight="10dp"
                 android:paddingBottom="10dp"
                 android:src="@drawable/trash"/>

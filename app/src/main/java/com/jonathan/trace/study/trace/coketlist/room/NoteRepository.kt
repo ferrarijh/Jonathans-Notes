@@ -19,6 +19,7 @@ class NoteRepository(private val noteDao: NoteDao){
         return noteDao.getAllNotesByTitle()
     }
     fun getAllNotesByBody(): LiveData<List<Note>> = noteDao.getAllNotesByBody()
+    fun getAllNotesByColor() = noteDao.getAllNotesByColor()
 
     fun getAllTrashNotes(): LiveData<List<Note>> = noteDao.getAllTrashNotes()
     fun getAllPrivateNotes(): LiveData<List<Note>> = noteDao.getAllPrivateNotes()

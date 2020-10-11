@@ -1,9 +1,11 @@
 package com.jonathan.trace.study.trace.coketlist.adapter.thumbnail
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jonathan.trace.study.trace.coketlist.R
@@ -39,17 +41,20 @@ class ThumbnailTrashAdapter(
             holder.itemView.tv_thumbnail_trash_date.text = note.dateTimeModified.substring(11)
         else
             holder.itemView.tv_thumbnail_trash_date.text = noteDate
-        holder.itemView.tv_thumbnail_trash_title.text = note.title
 
-        holder.itemView.tv_thumbnail_trash_body.text = note.body
+        val cv = holder.itemView.findViewById<CardView>(R.id.cv_thumbnail_trash)
+        cv.setBackgroundColor(Color.parseColor(note.color))
 
-        holder.itemView.setOnClickListener{
-            listener.onClickItem(note)
-        }
-
-        holder.itemView.setOnLongClickListener{
-            longListener.onLongClickItem(note)
-            true
+        holder.itemView.apply {
+            tv_thumbnail_trash_title.text = note.title
+            tv_thumbnail_trash_body.text = note.body
+            setOnClickListener{
+                listener.onClickItem(note)
+            }
+            setOnLongClickListener{
+                longListener.onLongClickItem(note)
+                true
+            }
         }
 
     }

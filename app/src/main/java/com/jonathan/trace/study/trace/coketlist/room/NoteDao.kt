@@ -15,11 +15,15 @@ interface NoteDao{
     @Query("SELECT * FROM note_table WHERE trash = 0 AND pw IS NULL ORDER BY dateTimeCreated DESC")
     fun getAllNotesByCreated(): LiveData<List<Note>>
 
-    @Query("SELECT * FROM note_table WHERE trash = 0 AND pw IS NULL ORDER BY title DESC")
+    @Query("SELECT * FROM note_table WHERE trash = 0 AND pw IS NULL ORDER BY title DESC, dateTimeModified DESC")
     fun getAllNotesByTitle(): LiveData<List<Note>>
 
-    @Query("SELECT * FROM note_table WHERE trash = 0 AND pw IS NULL ORDER BY body DESC")
+    @Query("SELECT * FROM note_table WHERE trash = 0 AND pw IS NULL ORDER BY body DESC, dateTimeModified DESC")
     fun getAllNotesByBody(): LiveData<List<Note>>
+
+    @Query("SELECT * FROM note_table WHERE trash = 0 AND pw IS NULL ORDER BY color, dateTimeModified DESC")
+    fun getAllNotesByColor(): LiveData<List<Note>>
+
 
     @Query("SELECT * FROM note_table WHERE trash = 1 ORDER BY dateTimeModified DESC")
     fun getAllTrashNotes(): LiveData<List<Note>>
