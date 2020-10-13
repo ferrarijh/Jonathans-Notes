@@ -1,36 +1,34 @@
 package com.jonathan.trace.study.trace.coketlist
 
-import android.os.Build
+import android.app.AlertDialog
+import android.content.res.Configuration
 import android.os.Bundle
-import android.text.InputType
 import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.activity.addCallback
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailPrivateAdapter
+import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
+import com.jonathan.trace.study.trace.coketlist.dialog.PwCheckDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
 import kotlinx.android.synthetic.main.fragment_private.*
 
 class PrivateFragment: Fragment(){
-    private lateinit var mViewModel: NoteViewModel
-    private lateinit var notes: LiveData<List<Note>>
+    private lateinit var nViewModel: NoteViewModel
+    private lateinit var privateNotes: LiveData<List<Note>>
     private lateinit var adapter: ThumbnailPrivateAdapter
     private lateinit var warnDeleteDialog: MyDialog
-    private lateinit var pwDialog: AlertDialog
-    private var selectedNote: Note? = null
+    private lateinit var pwCheckDialog: PwCheckDialog
+    private lateinit var removeLockDialog: PwCheckDialog
+    private lateinit var optionsDialog: AlertDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,14 +41,12 @@ class PrivateFragment: Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mViewModel = ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)
+        nViewModel = ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)
         setNotes()
         setDialog()
         setAdapter()
-        setOnBackPressed()
         setDrawer()
         setAppBar()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -59,8 +55,8 @@ class PrivateFragment: Fragment(){
     }
 
     private fun setNotes(){
-        notes = mViewModel.getAllPrivateNotes()
-        notes.observe(viewLifecycleOwner){
+        privateNotes = nViewModel.getAllPrivateNotes()
+        privateNotes.observe(viewLifecycleOwner){
             adapter.updateList(it)
         }
     }
@@ -70,72 +66,99 @@ class PrivateFragment: Fragment(){
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 
-    private fun setOnBackPressed(){
-        requireActivity().onBackPressedDispatcher.addCallback(this){
-            val action = PrivateFragmentDirections.actionPrivateFragmentToHomeFragment()
-            findNavController().navigate(action)
-        }
-    }
 
     private fun setAppBar(){
         requireActivity().findViewById<ImageView>(R.id.iv_hamburger).setImageResource(android.R.color.transparent)
         val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
         toolBar.setNavigationIcon(R.drawable.back)
         toolBar.navigationIcon?.setTint(resources.getColor(R.color.icons))
+
         toolBar.setNavigationOnClickListener{
-            findNavController().navigate(PrivateFragmentDirections.actionPrivateFragmentToHomeFragment())
+            findNavController().navigateUp()
         }
     }
 
     private fun setDialog(){
-        warnDeleteDialog = MyDialog(requireContext()){  //pClickListener
-            selectedNote?.let {
-                mViewModel.delete(it)
-                Toast.makeText(context, "Note deleted.", Toast.LENGTH_SHORT).show()
+        //warn permanent delete dialog
+        warnDeleteDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_deletion_permanent_private)){  //pClickListener
+            val notePointed = nViewModel.getNotePointed()!!.second
+            notePointed.let {
+                nViewModel.delete(it)
+                Toast.makeText(context, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
             }
             warnDeleteDialog.dismiss()
         }
 
-        val builderPw = AlertDialog.Builder(requireContext())
-        val et = EditText(requireContext())
-        et.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        builderPw.setView(et)
-            .setTitle(getString(R.string.pw))
-            .setPositiveButton("OK"){ _, _ ->
-                confirmPw(et.text.toString())
+        //pw check dialog
+        pwCheckDialog = PwCheckDialog(requireContext()){
+            val input = pwCheckDialog.findViewById<EditText>(R.id.et_pw_check).text.toString()
+            val notePointed = nViewModel.getNotePointed()!!.second
+            if(input == notePointed.pw){
+                pwCheckDialog.dismiss()
+
+                val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
+                toolBar.navigationIcon = null
+
+                val action = PrivateFragmentDirections.actionPrivateFragmentToEditNoteFragment()
+                action.note = notePointed
+                findNavController().navigate(action)
             }
-        pwDialog = builderPw.create()
+            else
+                Toast.makeText(context, getString(R.string.invalid_pw_note), Toast.LENGTH_SHORT).show()
+        }
+
+        //remove pw dialog
+        removeLockDialog = PwCheckDialog(requireContext()){
+            val input = removeLockDialog.findViewById<EditText>(R.id.et_pw_check).text.toString()
+            val notePointed = nViewModel.getNotePointed()!!.second
+            if(input == notePointed.pw){
+                notePointed.pw = null
+                nViewModel.update(notePointed)
+                //TODO("will adapter update itself?")
+
+                pwCheckDialog.dismiss()
+                Toast.makeText(context, getString(R.string.lock_removed), Toast.LENGTH_SHORT).show()
+            }
+            else
+                Toast.makeText(context, getString(R.string.invalid_pw_note), Toast.LENGTH_SHORT).show()
+        }
+
+        //options dialog
+        val oBuilder = AlertDialog.Builder(requireContext())
+        val removeLock = getString(R.string.remove_lock)
+        val permaDel = getString(R.string.permanent_deletion)
+        val options = arrayOf(removeLock, permaDel)
+
+        oBuilder.setItems(options){_, i ->
+            when(options[i]){
+                removeLock -> removeLockDialog.show()
+                permaDel -> warnDeleteDialog.show()
+            }
+        }
+        optionsDialog = oBuilder.create()
     }
 
-    private fun confirmPw(s: String){
-        if(s == selectedNote!!.pw){
-            val action = PrivateFragmentDirections.actionPrivateFragmentToEditNoteFragment()
-            action.note = selectedNote
-            findNavController().navigate(action)
-        }
-        else
-            Toast.makeText(context, "Invalid Password.", Toast.LENGTH_SHORT).show()
-    }
 
     private fun setAdapter(){
         adapter = ThumbnailPrivateAdapter(
-            notes.value as MutableList<Note>? ?: mutableListOf<Note>(),
+            privateNotes.value as MutableList<Note>? ?: mutableListOf<Note>(),
             object: ThumbnailPrivateAdapter.ThumbnailAdapterListener{
                 override fun <T> onClickItem(item: T) {
-                    selectedNote = item as Note
-                    pwDialog.show()
+                    pwCheckDialog.show()
                 }
             },
             object: ThumbnailPrivateAdapter.ThumbnailAdapterLongListener{
                 override fun <T> onLongClickItem(item: T) {
-                    selectedNote = item as Note
-                    warnDeleteDialog.show()
-                    warnDeleteDialog.findViewById<TextView>(R.id.tv_dialog_title).text = getString(R.string.warn_deletion_permanent_private)
+                    optionsDialog.show()
                 }
             })
 
         rv_notes_private.adapter = adapter
-        rv_notes_private.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        val ori = requireActivity().resources.configuration.orientation
+        if(ori == Configuration.ORIENTATION_LANDSCAPE)
+            rv_notes_private.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+        else if (ori == Configuration.ORIENTATION_PORTRAIT)
+            rv_notes_private.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
     }
 
 }

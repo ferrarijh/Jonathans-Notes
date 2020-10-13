@@ -3,7 +3,8 @@
     <string name="login">로그인</string>
     <string name="sign_up"><u>계정 만들기</u></string>
 
-    <string name="shakespeare">William Shakespeare (bapt. 26 April 1564 – 23 April 1616)[a] was an English playwright, poet, and actor, widely regarded as the greatest writer in the English language and the world\'s greatest dramatist.[2][3][4] He is often called England\'s national poet and the "Bard of Avon" (or simply "the Bard").[5][b] His extant works, including collaborations, consist of some 39 plays,[c] 154 sonnets, two long narrative poems, and a few other verses, some of uncertain authorship. His plays have been translated into every major living language and are performed more often than those of any other playwright.[7] They also continue to be studied and reinterpreted.</string>
+    <string name="shakespeare" translatable="false">William Shakespeare (bapt. 26 April 1564 – 23 April 1616)[a] was an English playwright, poet, and actor, widely regarded as the greatest writer in the English language and the world\'s greatest dramatist.[2][3][4] He is often called England\'s national poet and the "Bard of Avon" (or simply "the Bard").[5][b] His extant works, including collaborations, consist of some 39 plays,[c] 154 sonnets, two long narrative poems, and a few other verses, some of uncertain authorship. His plays have been translated into every major living language and are performed more often than those of any other playwright.[7] They also continue to be studied and reinterpreted.</string>
+    <string name="chunhyang" translatable="false">숙종대왕 즉위 초에 퇴기 월매는 자식이 없어 매일 기도를 하여 성참판과의 사이에서 딸 춘향을 낳는다. 춘향은 어릴 때부터 용모가 아름답고 시와 그림에 능하여 온 고을이 춘향을 칭송했다. 어느 봄날 사또 자제 이도령이 광한루에 봄 구경 갔다가 그 곳에서 그네를 타는 춘향을 보고 춘향의 아름다움에 반해 방자를 시켜 춘향을 데려오게 하지만, 춘향은 그에 응하지 않는다. 이도령은 그 날로 춘향의 집으로 찾아가 월매에게 춘향과 백년가약을 맺겠다고 맹세하고 춘향과 부부의 연을 맺는다. 그러던 어느 날, 부친의 남원부사 임기가 끝나자 이도령과 춘향은 이별을 맞이한다. 이도령은 춘향과 다시 만날 것을 기약하고 서울로 떠난다. 새로 부임한 변학도는 만사 제쳐두고 이름난 기생들을 불러 모아 연일 잔치를 벌이는데, 그 와중에 예쁘기로 소문난 춘향도 불려가게 된다. 변학도는 춘향이 기생의 딸이므로 춘향 또한 기생이나 마찬가지이니 수청을 들라고 한다, 그러나 춘향은 자신은 일부종사해야하니 수청을 들 수 없다고 거절하여 옥에 갇히게 되고, 화가 난 변학도가 춘향을 자신의 생일날 처벌하겠다고 한다. 한편 한양으로 간 이도령은 장원급제하여 암행어사로 다시 남원에 내려오게 된다. 이도령은 변학도의 횡포와 춘향이 겪은 일들을 모두 듣게 되지만 자신의 신분을 속이기 위해 거렁뱅이 행세를 하며 넋 나간 사람처럼 행동한다. 춘향은 그런 그를 원망하기는커녕 여전히 변치 않는 사랑을 보여주며 월매에게 그를 극진히 대접해라주라고 부탁하기까지 한다. 드디어 변학도의 생일잔치 날, 남루한 행색을 한 이도령이 들어와 자신이 시를 한 수 지을 테니 술 한 잔만 대접해 달라고 하며 변학도가 백성을 핍박하는 것을 꼬집는 시를 시어낸다. 변학도는 그 시를 보고도 이도령의 정체를 알아차리지 못한 채 춘향을 불러내라 명령하고, 곧 암행어사 이도령이 출두한다. 변학도와 그 무리들은 포박당하고 이몽룡은 춘향이 자신을 알아보지 못하는 것을 알고 자신의 수청을 들라한다. 춘향이 거절하고 이몽룡이 만족해하며 사실을 밝히자, 춘향은 어사인 이도령을 알아보게 되고, 둘은 기쁘게 재회하게 된다. 춘향은 굳은 절개로 인해 칭송받고 이도령과 함께 행복하게 산다.</string>
 
     <!-- RegisterActivity -->
     <string name="welcome">환영합니다 :)</string>
@@ -24,17 +25,19 @@
     <string name="settings">설정</string>
 
     <!-- dialog -->
+    <string name="warn_delete_multi">선택한 노트들을 휴지통에 넣나요?</string>
     <string name="warn_deletion_permanent_private">비밀 노트는 즉시 삭제됩니다.\n정말 삭제하나요?</string>
     <string name="warn_deletion_permanent">노트를 영구히 삭제하나요?</string>
     <string name="warn_clear_all">휴지통을 비울까요?</string>
     <string name="warn_deletion">노트를 삭제하나요?</string>
     <string name="warn_cancel_edit">편집을 취소하나요?</string>
-    <string name="ok">네</string>
-    <string name="cancel">아니요</string>
+    <string name="ok">확인</string>
+    <string name="cancel">취소</string>
 
     <string name="permanent_deletion">영구 삭제</string>
     <string name="recover">복원</string>
 
+    <string name="multi_sel">여러개 선택</string>
     <string name="delete">삭제</string>
     <string name="set_pw">비밀번호 설정</string>
 
@@ -44,11 +47,31 @@
     <string name="sort_by_body">내용 기준</string>
     <string name="sort_by_color">배경색 기준</string>
 
+    <string name="pw_recomm">4자리 비밀번호를 추천해요</string>
+
+    <string name="enter_pw">비밀번호를 입력해주세요</string>
+
+    <string name="remove_lock">잠금 없애기</string>
+
     <!-- Toast -->
     <string name="long_click">길게 눌러 저장하고 나가기</string>
     <string name="saved">저장!</string>
     <string name="moved_to_trash">노트를 휴지통에 넣었어요</string>
     <string name="deleted">삭제됐습니다</string>
-    <string name="title_and_body">제목이나 내용 없이 저장할 수 없어요</string>
+    <string name="cant_save_empty">빈 노트는 저장되지 않아요</string>
+
+    <string name="pw_confirm_mismatch">두 입력값이 다릅니다!</string>
+    <string name="warn_blank_pw">두 칸 모두 입력해주세요</string>
+
+    <string name="pw_set">비밀 노트로 이동합니다</string>
+    <string name="not_edited">저장할 내용이 없어요</string>
+    <string name="invalid_pw_note">비밀번호를 확인하세요</string>
+
+    <string name="deleted_perma">노트를 삭제했습니다</string>
+    <string name="cleared">쓱싹</string>
+    <string name="title">제목</string>
+    <string name="body">내용을 입력하세요</string>
+
+    <string name="lock_removed">잠금을 없앴습니다</string>
 
 </resources>

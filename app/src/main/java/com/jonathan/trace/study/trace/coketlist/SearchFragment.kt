@@ -3,39 +3,36 @@ package com.jonathan.trace.study.trace.coketlist
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.addCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailAdapter
+import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
+import com.jonathan.trace.study.trace.coketlist.dialog.PwDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.viewmodel.FragmentStateViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_search.*
 
 class SearchFragment: Fragment(){
-    private lateinit var mViewModel: NoteViewModel
-    private lateinit var fViewModel: FragmentStateViewModel
-    private lateinit var notesAllLive: LiveData<List<Note>>
+    private val nViewModel by lazy{ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)}
+    private val fViewModel by lazy {ViewModelProvider(this).get(FragmentStateViewModel::class.java)}
     private lateinit var adapter: ThumbnailAdapter
-    private lateinit var myDialog: MyDialog
-    private var selectedNote: Note? = null
+    private lateinit var deleteDialog: MyDialog
+    private lateinit var optionsDialog: AlertDialog
+    private lateinit var pwDialog: PwDialog
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,64 +42,118 @@ class SearchFragment: Fragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fViewModel = ViewModelProvider(this).get(FragmentStateViewModel::class.java)
-        mViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
 
-        notesAllLive = mViewModel.getAllNotes()
-        notesAllLive.observe(viewLifecycleOwner){
-            fViewModel.curNotesAll = it
-        }
-
+        setViewModel()
         setTextChangedListener()
-        setAdapter()
         setDialog()
-        setOnBackPressed()
+        setAdapter()
         setOtherUI()
     }
 
+    private fun setViewModel(){
+        if(fViewModel.curNotesAll == null){
+            val newNotesLive = getNewNotesBySort()
+            fViewModel.setCurNotesAll(newNotesLive)
+        }
+        fViewModel.curNotesAll!!.observe(viewLifecycleOwner){
+            //do nothing. Just for update
+        }
+    }
+
+    private fun getNewNotesBySort(): LiveData<List<Note>> {
+        return when(nViewModel.prevSort.value){
+            NoteViewModel.MODIFIED -> nViewModel.getAllNotes()
+            NoteViewModel.CREATED -> nViewModel.getAllNotesByCreated()
+            NoteViewModel.TITLE -> nViewModel.getAllNotesByTitle()
+            NoteViewModel.BODY -> nViewModel.getAllNotesByBody()
+            NoteViewModel.COLOR -> nViewModel.getAllNotesByColor()
+            else -> nViewModel.getAllNotes()
+        }
+    }
+
     private fun setOtherUI(){
+        //hide toolbar
         val parent = requireActivity() as AppCompatActivity
         parent.setSupportActionBar(parent.findViewById(R.id.toolbar))
         parent.supportActionBar!!.hide()
 
+        //set home button to back
         val back = parent.findViewById<ImageView>(R.id.iv_back)
         back.setOnClickListener{
-            val action = SearchFragmentDirections.actionSearchFragmentToHomeFragment()
-            findNavController().navigate(action)
+            findNavController().navigateUp()
         }
 
-        setDrawer()
-    }
-
-    private fun setDrawer(){
+        //set drawer
         val drawer = requireActivity().findViewById<DrawerLayout>(R.id.layout_drawer)
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 
-    private fun setOnBackPressed(){
-        requireActivity().onBackPressedDispatcher.addCallback(this){
-            val action = SearchFragmentDirections.actionSearchFragmentToHomeFragment()
-            findNavController().navigate(action)
+    private fun setDialog(){
+        //delete dialog
+        deleteDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_deletion)){  //pClickListener
+            val notePointed = nViewModel.getNotePointed()?.second
+            notePointed?.let {
+                it.trash = 1
+                nViewModel.update(it)
+
+                val newNotesLive = getNewNotesBySort()
+                fViewModel.setCurNotesAll(newNotesLive)
+                fViewModel.curNotesAll!!.observe(viewLifecycleOwner){
+                    //do nothing
+                }
+
+                setAfterModified()
+
+                Toast.makeText(context, getString(R.string.moved_to_trash), Toast.LENGTH_SHORT).show()
+            }
+            deleteDialog.dismiss()
         }
+
+        //password dialog
+        pwDialog = PwDialog(requireContext()){
+            val pw = pwDialog.findViewById<EditText>(R.id.et_pw_note).text.toString()
+            val pwConfirm = pwDialog.findViewById<EditText>(R.id.et_pw_confirm_note).text.toString()
+            if(pw.isBlank() || pwConfirm.isBlank()) {
+                Toast.makeText(context, getString(R.string.warn_blank_pw), Toast.LENGTH_SHORT).show()
+            } else if(pw != pwConfirm){
+                Toast.makeText(context, getString(R.string.pw_confirm_mismatch), Toast.LENGTH_SHORT).show()
+            } else {
+                setPw(pw)
+                pwDialog.dismiss()
+            }
+        }
+
+        //options Dialog
+        val setPw = getString(R.string.set_pw)
+        val delete = getString(R.string.delete)
+        val options = arrayOf(delete, setPw)
+
+        val oBuilder = AlertDialog.Builder(requireContext())
+        oBuilder.setItems(options){ _, i ->
+            when(options[i]){
+                setPw -> pwDialog.show()
+                delete -> deleteDialog.show()
+            }
+        }
+        optionsDialog = oBuilder.create()
     }
 
-    private fun setDialog(){
-        myDialog = MyDialog(requireContext()){  //pClickListener
-            selectedNote?.let {
-                mViewModel.delete(it)
-                Toast.makeText(context, "Note deleted.", Toast.LENGTH_SHORT).show()
-            }
-            myDialog.dismiss()
-        }
+    private fun setPw(s: String){
+        val notePointed = nViewModel.getNotePointed()!!.second
+        notePointed.pw = s
+        nViewModel.update(notePointed)
+        setAfterModified()
+        Toast.makeText(context, getString(R.string.pw_set), Toast.LENGTH_SHORT).show()
     }
 
     private fun setAdapter(){
         adapter = ThumbnailAdapter(
-            mutableListOf<Note>(),
+            mutableListOf(),
             object: ThumbnailAdapter.ThumbnailAdapterListener{
                 override fun <T> onClickItem(item: T) {
                     val action = SearchFragmentDirections.actionSearchFragmentToEditNoteFragment()
                     action.note = item as Note
+                    action.fromSearch = true
 
                     requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
                     findNavController().navigate(action)
@@ -111,47 +162,56 @@ class SearchFragment: Fragment(){
             },
             object: ThumbnailAdapter.ThumbnailAdapterLongListener{
                 override fun <T> onLongClickItem(item: T) {
-                    selectedNote = item as Note
-                    myDialog.show()
-                    myDialog.findViewById<TextView>(R.id.tv_dialog_title).text = getString(R.string.warn_deletion)
+                    optionsDialog.show()
                 }
-            })
+            }
+        )
 
         rv_notes_searched.adapter = adapter
         rv_notes_searched.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
-        if(fViewModel.curNotes.isNotEmpty()) {
-            Log.d("","adapter.thumbnailsVisibe.size: ${adapter.thumbnailsVisible.size}")
-            Log.d("", "fViewModel.curNotes.size: ${fViewModel.curNotes.size}")
-            adapter.updateList(fViewModel.curNotes)
-            Log.d("", "adapter.thumbnailsVisible.size: ${adapter.thumbnailsVisible.size}")
+        if(fViewModel.curNotes.value!!.isNotEmpty()) {
+            adapter.updateList(fViewModel.curNotes.value!!)
+        }
+
+        fViewModel.curNotes.observe(viewLifecycleOwner){list->
+            adapter.updateList(list)
         }
     }
 
     private fun setTextChangedListener(){
         et_search.addTextChangedListener(object: TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                //no action
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                Log.d("", "onTextChanged() called")
                 s?.let{
-                    fViewModel.curNotes.clear()
+                    val notes = fViewModel.curNotes.value!!
+                    notes.clear()
                     if (!it.isBlank()){
-                        fViewModel.curNotesAll.forEach{n ->
+                        val notesAll = fViewModel.curNotesAll!!.value!!
+                        notesAll.forEach{n ->
                             if(it in n.title || it in n.body){
-                                fViewModel.curNotes.add(n)
+                                notes.add(n)
                             }
                         }
                     }
-                    adapter.updateList(fViewModel.curNotes)
+                    fViewModel.curNotes.value = notes
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {
+                //no action
             }
 
         })
+    }
+
+    private fun setAfterModified(){
+        val goneNote = nViewModel.getNotePointed()!!.second
+        fViewModel.curNotes.value!!.remove(goneNote)
+        fViewModel.curNotes.value = fViewModel.curNotes.value!!
     }
 
 }

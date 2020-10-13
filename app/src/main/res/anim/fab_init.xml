@@ -7,4 +7,8 @@
         android:toXScale="0.6"
         android:toYScale="0.6"
         android:duration="1"/>
+    <rotate
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:toDegrees="90"/>
 </set>

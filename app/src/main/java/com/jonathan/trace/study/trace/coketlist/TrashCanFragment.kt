@@ -1,11 +1,11 @@
 package com.jonathan.trace.study.trace.coketlist
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -17,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailTrashAdapter
+import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
 import kotlinx.android.synthetic.main.fragment_trash_can.*
@@ -27,7 +28,7 @@ class TrashCanFragment : Fragment() {
     private lateinit var notes: LiveData<List<Note>>
     private lateinit var adapter: ThumbnailTrashAdapter
     private lateinit var warnDialog: MyDialog
-    private lateinit var warnClearDialog: AlertDialog
+    private lateinit var warnClearDialog: MyDialog
     private lateinit var selectDialog: AlertDialog
     private var selectedNote: Note? = null
 
@@ -47,7 +48,6 @@ class TrashCanFragment : Fragment() {
         setDialog()
         setAdapter()
         setAppBar()
-        setOnBackPressed()
         setDrawer()
 
     }
@@ -60,6 +60,7 @@ class TrashCanFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         warnClearDialog.show()
+        warnClearDialog.findViewById<TextView>(R.id.tv_dialog_title).text = getString(R.string.warn_clear_all)
         return super.onOptionsItemSelected(item)
     }
 
@@ -75,13 +76,6 @@ class TrashCanFragment : Fragment() {
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 
-    private fun setOnBackPressed(){
-        requireActivity().onBackPressedDispatcher.addCallback(this){
-            val action = TrashCanFragmentDirections.actionTrashCanFragmentToHomeFragment()
-            findNavController().navigate(action)
-        }
-    }
-
     private fun setAppBar(){
         val parent = requireActivity() as AppCompatActivity
 
@@ -92,18 +86,17 @@ class TrashCanFragment : Fragment() {
         toolBar.setNavigationIcon(R.drawable.back)
         toolBar.navigationIcon?.setTint(resources.getColor(R.color.icons))
         toolBar.setNavigationOnClickListener{
-            val action = TrashCanFragmentDirections.actionTrashCanFragmentToHomeFragment()
-            findNavController().navigate(action)
+            findNavController().navigateUp()
         }
         parent.supportActionBar!!.setDisplayShowTitleEnabled(false)
     }
 
     private fun setDialog(){
 
-        warnDialog = MyDialog(requireContext()){  //pClickListener
+        warnDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_deletion_permanent)){  //pClickListener
             selectedNote?.let {
                 mViewModel.delete(it)
-                Toast.makeText(context, "Note deleted.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.deleted_perma), Toast.LENGTH_SHORT).show()
             }
             warnDialog.dismiss()
         }
@@ -114,24 +107,17 @@ class TrashCanFragment : Fragment() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setItems(items){_, b ->
             when(items[b]){
-                permaDel -> deleteNote()
+                permaDel -> warnDialog.show()
                 recover -> recoverNote()
             }
         }
         selectDialog = builder.create()
 
-        val builderClear = AlertDialog.Builder(requireContext())
-        builderClear.setTitle(getString(R.string.warn_clear_all))
-            .setPositiveButton("OK"){ _, _ ->
-                mViewModel.deleteAll()
-                Toast.makeText(context, "All trashed notes deleted.", Toast.LENGTH_SHORT).show()
-            }
-        warnClearDialog = builderClear.create()
-    }
-
-    private fun deleteNote(){
-        warnDialog.show()
-        warnDialog.findViewById<TextView>(R.id.tv_dialog_title).text = getString(R.string.warn_deletion_permanent)
+        warnClearDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_clear_all)){
+            mViewModel.deleteAll()
+            Toast.makeText(context, getString(R.string.cleared), Toast.LENGTH_SHORT).show()
+            warnClearDialog.dismiss()
+        }
     }
 
     private fun recoverNote(){
@@ -157,6 +143,10 @@ class TrashCanFragment : Fragment() {
             })
 
         rv_notes_trash.adapter = adapter
-        rv_notes_trash.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        val ori = requireActivity().resources.configuration.orientation
+        if(ori == Configuration.ORIENTATION_LANDSCAPE)
+            rv_notes_trash.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+        else if (ori == Configuration.ORIENTATION_PORTRAIT)
+            rv_notes_trash.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
     }
 }

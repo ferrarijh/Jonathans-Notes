@@ -1,24 +1,24 @@
-package com.jonathan.trace.study.trace.coketlist
+package com.jonathan.trace.study.trace.coketlist.dialog
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Point
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.dialog.*
 
 class MyDialog(
     context: Context,
+    private val layoutId: Int,
+    val title: String,
     private val pClickListener: View.OnClickListener,
 ): Dialog(context) {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.dialog)
+        setContentView(layoutId)
 
         val lp = window?.attributes
         lp?.apply{
@@ -36,6 +36,8 @@ class MyDialog(
             setLayout((newX*0.9).toInt(), (newY*0.9).toInt())
             Log.d("", "layout: $newX, $newY")
         }
+
+        tv_dialog_title.text = title
 
         btn_positive.setOnClickListener(pClickListener)
         btn_negative.setOnClickListener{

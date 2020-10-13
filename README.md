@@ -1,3 +1,47 @@
+# ROOM DB-Repository-ViewModel pattern
+
+app architecture guide:
+https://developer.android.com/jetpack/guide?hl=ko
+
+## Repository
+* properties - service instance (ex. dao instance, webservice instance)
+* methods - fetch specific data (ex. fun getUser(): LiveData<User>)
+
+## ViewModel
+* properties - LiveData objects on which views will observe. 
+
+# LiveData
+
+### When NOT to use LiveData in ViewModel?
+* when multiple views are not interacting each other there's no need to use LiveData.
+
+### Extra
+* when updating collection of instance in adapter class with another list wrapped with LiveData container,
+be aware that this new list should be handled asynchronously.
+Thus, below code will trigger NullPointerException : 
+
+```kotlin
+    val newListLive = myViewModel.getUsers()    //fetched from ROOM DB
+    myAdapter.submitList(newListLive.value!!)    //NO NO!
+```
+
+```newListLive.value``` is asynchronously updating but ```myAdapter``` tries to take the value of newListLive
+right away, before newListLive has finished fetching all data. By the time ```myAdapter``` tries to access
+```newListLive.value``` the value is null so this will trigger NullPointerException.
+The right way to do is:
+
+```kotlin
+    val newListLive = myViewModel.gerUsers()
+    newListLive.observe(viewLifeCycleOwner){
+        adapter.submitList(it)
+    }
+```
+
+* If observer is not set on a LiveData object, the object won't update values. For example, if
+```LiveData<List<User>>``` is returned by Dao but no observer is set then the value of the LiveData object will always be null.
+
+# UI components
+
 ## Collapsing Toolbar with RecyclerView
 * Remember: CoordinatorLayout → AppbarLayout → Toolbar
 
@@ -52,18 +96,6 @@ How it's done here:
 * Container for Fragments. Extends FrameLayout.
 * Original FrameLayout had problem with properly showing exiting animation of Fragment. FCV fixes this issue.
 
-# ROOM DB-Repository-ViewModel pattern
-
-app architecture guide:
-https://developer.android.com/jetpack/guide?hl=ko
-
-## Repository
-* properties - service instance (ex. dao instance, webservice instance)
-* methods - fetch specific data (ex. fun getUser(): LiveData<User>)
-
-## ViewModel
-* properties - LiveData objects which views will observe. 
-
 ### Extra
 * parent.supportActionBar is lost after rotation so set it back like below:
 ```kotlin
@@ -99,3 +131,23 @@ https://developer.android.com/jetpack/guide?hl=ko
         }
 ```
 By default window is whole screen for app. (area except notification bar and bottom bar)
+
+
+
+# Furthermore..
+* Iterating through Collection without iterators to remove entry will trigger ConcurrentModificationException.
+
+Bad: (will trigger ConcurrentModificationException)
+```kotlin
+    myMap.forEach{
+        myMap.remove(it.key)
+    }
+```
+Good:
+```kotlin
+    val iter = myMap.iterator()
+    while(iter.hasNext()){
+        iter.next()
+        iter.remove()
+    }
+```

@@ -129,9 +129,15 @@
                 app:borderWidth="0dp"
                 android:visibility="invisible"/>
         </LinearLayout>
+        <Button
+            android:id="@+id/btn_delete_multi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:text="DELETE MULTI"
+            android:visibility="invisible"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nv"
         android:layout_width="250dp"

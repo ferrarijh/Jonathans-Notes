@@ -10,19 +10,17 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.GestureDetectorCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.jonathan.trace.study.trace.coketlist.gesturelistener.MyGestureListener
+import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.viewmodel.FragmentStateViewModel
@@ -35,7 +33,7 @@ import java.util.*
 
 class EditNoteFragment: Fragment(){
     private var mNote: Note? = null
-    private lateinit var mDialog: MyDialog
+    private lateinit var warnDialog: MyDialog
     private lateinit var mViewModel: NoteViewModel
     private lateinit var fViewModel: FragmentStateViewModel
     private val isPaletteOpen = MutableLiveData<Boolean>()
@@ -98,6 +96,7 @@ class EditNoteFragment: Fragment(){
         parent.apply {
             setSupportActionBar(toolBar)
             supportActionBar!!.setDisplayShowTitleEnabled(false)
+            supportActionBar!!.show()
         }
 
         //ImageView used as button since navigation icon does not support long click
@@ -110,7 +109,10 @@ class EditNoteFragment: Fragment(){
                     Toast.makeText(context, getString(R.string.long_click), Toast.LENGTH_SHORT).show()
             }
             setOnLongClickListener{
-                saveNote()
+                if(isEdited())
+                    saveNote()
+                else
+                    Toast.makeText(context, getString(R.string.not_edited), Toast.LENGTH_SHORT).show()
                 goBack()
                 true
             }
@@ -133,14 +135,12 @@ class EditNoteFragment: Fragment(){
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             if(mNote != null){
                 if(isEdited()) {
-                    mDialog.show()
-                    mDialog.findViewById<TextView>(R.id.tv_dialog_title).text = getString(R.string.warn_cancel_edit)  //find dialog view after showing it.
+                    warnDialog.show()
                     return@addCallback
                 }
             }else{
                 if(et_title.text.isNotBlank() || et_body.text.isNotBlank()){
-                    mDialog.show()
-                    mDialog.findViewById<TextView>(R.id.tv_dialog_title).text = getString(R.string.warn_cancel_edit)
+                    warnDialog.show()
                     return@addCallback
                 }
             }
@@ -173,10 +173,16 @@ class EditNoteFragment: Fragment(){
 
         fabSave.apply {
             setOnClickListener {
-                saveNote()
+                if(isEdited())
+                    saveNote()
+                else
+                    Toast.makeText(context, getString(R.string.not_edited), Toast.LENGTH_SHORT).show()
             }
             setOnLongClickListener{
-                saveNote()
+                if(isEdited())
+                    saveNote()
+                else
+                    Toast.makeText(context, getString(R.string.not_edited), Toast.LENGTH_SHORT).show()
                 goBack()
                 true
             }
@@ -243,23 +249,21 @@ class EditNoteFragment: Fragment(){
 
     @SuppressLint("ResourceType")
     private fun saveNote(){
-
         val title = et_title.text.toString().trim()
         val body = et_body.text.toString().trim()
         val dateTime = getDateTime()
-        if(title.isBlank() || body.isBlank()){
-            Toast.makeText(context, "Title and body can't be empty", Toast.LENGTH_SHORT).show()
+
+        if(body.isBlank() && body.isBlank()){
+            Toast.makeText(context, getString(R.string.cant_save_empty), Toast.LENGTH_SHORT).show()
             return
         }
+
         if(mNote == null) {
             mNote = Note(0, title, body, dateTime, dateTime, 0, colorSelected)
             CoroutineScope(Dispatchers.IO).launch {
                 mViewModel.addNote(mNote!!)
-            }.invokeOnCompletion {
-                CoroutineScope(Dispatchers.Main).launch{
-                    Toast.makeText(context, getString(R.string.saved), Toast.LENGTH_SHORT).show()
-                }
             }
+            Toast.makeText(context, getString(R.string.saved), Toast.LENGTH_SHORT).show()
         }else{
             mNote!!.title = title
             mNote!!.body = body
@@ -267,18 +271,15 @@ class EditNoteFragment: Fragment(){
             mNote!!.color = colorSelected
             CoroutineScope(Dispatchers.IO).launch {
                 mViewModel.update(mNote!!)
-            }.invokeOnCompletion {
-                CoroutineScope(Dispatchers.Main).launch{
-                    Toast.makeText(context, getString(R.string.saved), Toast.LENGTH_SHORT).show()
-                }
             }
+            Toast.makeText(context, getString(R.string.saved), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun setDialog(){
-        mDialog = MyDialog(requireContext()){
+        warnDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_cancel_edit)){
             goBack()
-            mDialog.dismiss()
+            warnDialog.dismiss()
         }
     }
 
@@ -303,8 +304,14 @@ class EditNoteFragment: Fragment(){
         fabLemon.hide()
         fabMint.hide()
         fabWhite.hide()
-        val action = EditNoteFragmentDirections.actionEditNoteFragmentToHomeFragment()
-        findNavController().navigate(action)
+
+
+        arguments?.let{
+            val fromSearch = EditNoteFragmentArgs.fromBundle(it).fromSearch
+            if(fromSearch)
+                findNavController().popBackStack(R.id.homeFragment, false)
+        }
+        findNavController().navigateUp()
     }
 
 }

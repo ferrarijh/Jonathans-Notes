@@ -7,10 +7,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NoteViewModel (app: Application): AndroidViewModel(app){
+    /**
+     * ROOM components
+     * **/
     private val repository: NoteRepository
 
     //TODO("bug - val getAllNotes error")
@@ -31,9 +35,6 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
     fun getAllNotesByBody() = repository.getAllNotesByBody()
     fun getAllNotesByColor() = repository.getAllNotesByColor()
 
-    enum class SortState{ MODIFIED, CREATED, TITLE, BODY, COLOR}
-    val sortState = MutableLiveData<SortState>(SortState.MODIFIED)
-
     init{
         val noteDao = NoteDatabase.getDatabase(app).getNoteDao()
         repository = NoteRepository(noteDao)
@@ -44,7 +45,6 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
         getAllNotesByCreated = repository.getAllNotesByCreated()
         getAllNotesByTitle = repository.getAllNotesByTitle()
         getAllNotesByBody = repository.getAllNotesByBody()
-
  */
     }
 
@@ -72,4 +72,86 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
         }
     }
 
+    /**
+     * selected note on click
+     */
+    private var notePointed: Pair<Int, Note>? = null
+    fun setNotePointed(pos: Int, note: Note){
+        notePointed = Pair(pos, note)
+    }
+    fun getNotePointed() = notePointed
+
+    /**
+     * for multi selection
+     * **/
+    companion object{
+        const val ON = true
+        const val OFF = false
+
+        const val MODIFIED = 1
+        const val CREATED = 2
+        const val TITLE = 3
+        const val BODY = 4
+        const val COLOR = 5
+    }
+
+    private val _prevSort = MutableLiveData<Int>()
+    val prevSort
+        get() = _prevSort
+    fun setPrevSort(sortBy: Int){
+        _prevSort.value = sortBy
+    }
+
+    val selMode = MutableLiveData<Boolean>()
+    val selected = mutableMapOf<Int, Note?>()
+
+    init {
+        _prevSort.value = MODIFIED
+        selMode.value = false
+    }
+
+    fun getSelMode(): Boolean = selMode.value!!
+    fun setSelMode(mode: Boolean){  //update livedata & clear selected IF new mode is OFF
+        selMode.value = mode
+        if(selMode.value == OFF){
+            selected.clear()
+        }
+    }
+
+    fun toggleSelectedWith(pos: Int, note: Note){
+        if(!selMode.value!!)
+            throw Exception("toggleSelectedWith() should NOT be called when selMode.value == OFF")
+
+        if(selected[pos] == null)
+            selected[pos] = note
+        else
+            selected.remove(pos)
+    }
+
+    fun deleteSelectedAndUpdateWith(): LiveData<List<Note>>{
+        if(!selMode.value!!)
+            throw Exception("deletedSelected() should NOT be called when selMode.value == OFF")
+
+        val iter = selected.iterator()
+        while(iter.hasNext()){
+            val note = iter.next().value!!
+            note.trash = 1
+            update(note)
+            iter.remove()
+        }
+        val newListLive = when(prevSort.value!!){
+            MODIFIED -> getAllNotes()
+            CREATED -> getAllNotesByCreated()
+            TITLE -> getAllNotesByTitle()
+            BODY -> getAllNotesByBody()
+            COLOR -> getAllNotesByColor()
+            else -> getAllNotes()
+        }
+
+        //TODO("updating adapter should be ASYNCHRONOUS!!")
+        //adapter.updateList(newList.value!!)
+
+        setSelMode(OFF)
+        return newListLive
+    }
 }

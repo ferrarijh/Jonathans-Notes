@@ -14,7 +14,7 @@
     <string name="lock">Private Note</string>
     <string name="trashcan">Trash Can</string>
     <string name="settings">Settings</string>
-    <string name="warn_deletion_permanent_private">Private notes are deleted immediately.\\nSure you want to delete?</string>
+    <string name="warn_deletion_permanent_private">Private note will delete instantly. Continue?</string>
     <string name="warn_deletion_permanent">Permanently delete note?</string>
     <string name="warn_clear_all">Empty trash can?</string>
     <string name="warn_deletion">Delete note?</string>
@@ -34,5 +34,20 @@
     <string name="saved">Saved!</string>
     <string name="moved_to_trash">Note moved to trash can</string>
     <string name="deleted">Deleted</string>
-    <string name="title_and_body">Can\'t save with empty title or body</string>
+    <string name="cant_save_empty">Can\'t save nothing!</string>
+    <string name="pw_confirm_mismatch">Two inputs not matched!</string>
+    <string name="pw_set">Note marked as private</string>
+    <string name="pw_recomm">Nice short 4 digit is recommended</string>
+    <string name="enter_pw">Enter password</string>
+    <string name="not_edited">Nothing to save</string>
+    <string name="invalid_pw_note">Invaild password</string>
+    <string name="warn_blank_pw">Please fill both boxes</string>
+    <string name="deleted_perma">Note deleted</string>
+    <string name="cleared">nice and clean</string>
+    <string name="title">Title</string>
+    <string name="body">Body</string>
+    <string name="multi_sel">Multi-select</string>
+    <string name="warn_delete_multi">Move selected notes to trash can?</string>
+    <string name="remove_lock">Remove Lock</string>
+    <string name="lock_removed">Lock removed</string>
 </resources>

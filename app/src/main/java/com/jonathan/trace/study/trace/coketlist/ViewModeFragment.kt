@@ -29,7 +29,6 @@ class ViewModeFragment : Fragment(){
         tv_note_title.text = note.title
         tv_note_body.text = note.body
         tv_note_body.movementMethod = ScrollingMovementMethod()
-        setOnBackPressed()
         setDrawer()
         setAppBar()
     }
@@ -38,20 +37,12 @@ class ViewModeFragment : Fragment(){
         requireActivity().findViewById<ImageView>(R.id.iv_hamburger).setImageResource(android.R.color.transparent)
         val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
         toolBar.setNavigationOnClickListener{
-            val action = ViewModeFragmentDirections.actionViewModeFragmentToTrashCanFragment()
-            findNavController().navigate(action)
+            findNavController().navigateUp()
         }
     }
 
     private fun setDrawer(){
         val drawer = requireActivity().findViewById<DrawerLayout>(R.id.layout_drawer)
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-    }
-
-    private fun setOnBackPressed(){
-        requireActivity().onBackPressedDispatcher.addCallback(this){
-            val action = ViewModeFragmentDirections.actionViewModeFragmentToTrashCanFragment()
-            findNavController().navigate(action)
-        }
     }
 }

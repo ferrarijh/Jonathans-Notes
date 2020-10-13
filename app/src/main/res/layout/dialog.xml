@@ -22,7 +22,7 @@
             android:paddingTop="30dp"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
-            android:text="WARNING"
+            android:text="@string/warn_deletion_permanent_private"
             android:textStyle="bold"
             android:textSize="20sp"/>
         <LinearLayout
