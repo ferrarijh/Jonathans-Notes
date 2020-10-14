@@ -1,4 +1,4 @@
-package com.jonathan.trace.study.trace.coketlist.adapter.thumbnail
+package com.jonathan.trace.study.trace.coketlist.thumbnail.adapter
 
 import android.graphics.Color
 import android.util.Log
@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.room.Note
-import kotlinx.android.synthetic.main.thumbnail.view.*
-import kotlinx.android.synthetic.main.thumbnail.view.tv_thumbnail_date
 import kotlinx.android.synthetic.main.thumbnail_trash.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +17,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Deprecated("Use separate ViewHolder rather than separate adapters")
 class ThumbnailTrashAdapter(
     private var thumbnails: MutableList<Note> = mutableListOf<Note>(),
     private val listener: ThumbnailAdapterListener,

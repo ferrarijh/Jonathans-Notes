@@ -1,4 +1,4 @@
-package com.jonathan.trace.study.trace.coketlist.adapter.thumbnail
+package com.jonathan.trace.study.trace.coketlist.thumbnail.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import com.jonathan.trace.study.trace.coketlist.room.Note

@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailAdapter
+import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
 import com.jonathan.trace.study.trace.coketlist.dialog.DeleteMultiDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.PwDialog
@@ -333,6 +333,8 @@ class HomeFragment : Fragment() {
     private fun setAdapter(){
         adapter = ThumbnailAdapter(
             notes.value as MutableList<Note>? ?: mutableListOf<Note>(),
+            R.layout.thumbnail,
+            ThumbnailAdapter.HOME,
             object : ThumbnailAdapter.ThumbnailAdapterListener {
                 override fun <T> onClickItem(item: T) {
                     requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)

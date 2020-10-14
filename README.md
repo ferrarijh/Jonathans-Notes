@@ -18,8 +18,9 @@ https://developer.android.com/jetpack/guide?hl=ko
 ### Extra
 * when updating collection of instance in adapter class with another list wrapped with LiveData container,
 be aware that this new list should be handled asynchronously.
-Thus, below code will trigger NullPointerException : 
+Thus, below code will trigger NullPointerException.
 
+Bad:
 ```kotlin
     val newListLive = myViewModel.getUsers()    //fetched from ROOM DB
     myAdapter.submitList(newListLive.value!!)    //NO NO!
@@ -28,8 +29,9 @@ Thus, below code will trigger NullPointerException :
 ```newListLive.value``` is asynchronously updating but ```myAdapter``` tries to take the value of newListLive
 right away, before newListLive has finished fetching all data. By the time ```myAdapter``` tries to access
 ```newListLive.value``` the value is null so this will trigger NullPointerException.
-The right way to do is:
+The right way to do is at below.
 
+Good:
 ```kotlin
     val newListLive = myViewModel.gerUsers()
     newListLive.observe(viewLifeCycleOwner){
@@ -151,3 +153,6 @@ Good:
         iter.remove()
     }
 ```
+
+# Unsolved
+* LiveData retrieved by ROOM db seems to update automatically after change in dataset?

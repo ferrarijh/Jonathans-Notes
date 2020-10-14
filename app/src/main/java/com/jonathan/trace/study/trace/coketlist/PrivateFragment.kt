@@ -14,17 +14,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailPrivateAdapter
+import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailPrivateAdapter
 import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.PwCheckDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
+import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
 import kotlinx.android.synthetic.main.fragment_private.*
 
 class PrivateFragment: Fragment(){
     private lateinit var nViewModel: NoteViewModel
     private lateinit var privateNotes: LiveData<List<Note>>
-    private lateinit var adapter: ThumbnailPrivateAdapter
+    private lateinit var adapter: ThumbnailAdapter
     private lateinit var warnDeleteDialog: MyDialog
     private lateinit var pwCheckDialog: PwCheckDialog
     private lateinit var removeLockDialog: PwCheckDialog
@@ -110,7 +111,7 @@ class PrivateFragment: Fragment(){
         //remove pw dialog
         removeLockDialog = PwCheckDialog(requireContext()){
             val input = removeLockDialog.findViewById<EditText>(R.id.et_pw_check).text.toString()
-            val notePointed = nViewModel.getNotePointed()!!.second
+            val notePointed = nViewModel.getNotePointed()!!.second  //TODO("NullPointerException")
             if(input == notePointed.pw){
                 notePointed.pw = null
                 nViewModel.update(notePointed)
@@ -140,6 +141,21 @@ class PrivateFragment: Fragment(){
 
 
     private fun setAdapter(){
+        adapter = ThumbnailAdapter(
+            privateNotes.value as MutableList<Note>? ?: mutableListOf<Note>(),
+            R.layout.thumbnail_private,
+            ThumbnailAdapter.PRIVATE,
+            object: ThumbnailAdapter.ThumbnailAdapterListener{
+                override fun <T> onClickItem(item: T) {
+                    pwCheckDialog.show()
+                }
+            },
+            object: ThumbnailAdapter.ThumbnailAdapterLongListener{
+                override fun <T> onLongClickItem(item: T) {
+                    optionsDialog.show()
+                }
+            })
+        /*
         adapter = ThumbnailPrivateAdapter(
             privateNotes.value as MutableList<Note>? ?: mutableListOf<Note>(),
             object: ThumbnailPrivateAdapter.ThumbnailAdapterListener{
@@ -152,6 +168,8 @@ class PrivateFragment: Fragment(){
                     optionsDialog.show()
                 }
             })
+
+         */
 
         rv_notes_private.adapter = adapter
         val ori = requireActivity().resources.configuration.orientation

@@ -18,7 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.appbar.AppBarLayout
-import com.jonathan.trace.study.trace.coketlist.adapter.thumbnail.ThumbnailAdapter
+import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
 import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.PwDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
@@ -149,15 +149,11 @@ class SearchFragment: Fragment(){
     private fun setAdapter(){
         adapter = ThumbnailAdapter(
             mutableListOf(),
+            R.layout.thumbnail,
+            ThumbnailAdapter.HOME,
             object: ThumbnailAdapter.ThumbnailAdapterListener{
                 override fun <T> onClickItem(item: T) {
-                    val action = SearchFragmentDirections.actionSearchFragmentToEditNoteFragment()
-                    action.note = item as Note
-                    action.fromSearch = true
-
-                    requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
-                    findNavController().navigate(action)
-
+                    goToEditNoteWith(item as Note)
                 }
             },
             object: ThumbnailAdapter.ThumbnailAdapterLongListener{
@@ -204,7 +200,6 @@ class SearchFragment: Fragment(){
             override fun afterTextChanged(s: Editable?) {
                 //no action
             }
-
         })
     }
 
@@ -212,6 +207,15 @@ class SearchFragment: Fragment(){
         val goneNote = nViewModel.getNotePointed()!!.second
         fViewModel.curNotes.value!!.remove(goneNote)
         fViewModel.curNotes.value = fViewModel.curNotes.value!!
+    }
+
+    private fun goToEditNoteWith(item: Note){
+        val action = SearchFragmentDirections.actionSearchFragmentToEditNoteFragment()
+        action.note = item
+        action.fromSearch = true
+
+        requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
+        findNavController().navigate(action)
     }
 
 }

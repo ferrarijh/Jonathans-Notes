@@ -1,16 +1,16 @@
-package com.jonathan.trace.study.trace.coketlist.adapter.thumbnail
+package com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder
 
 import android.graphics.Color
 import android.view.View
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
+import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
 import kotlinx.android.synthetic.main.thumbnail.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,6 +47,7 @@ class ThumbnailViewHolder(
 
             setOnClickListener{
                 val curPos = layoutPosition
+
                 nViewModel.setNotePointed(curPos, note)
                 if(nViewModel.getSelMode() == NoteViewModel.OFF)
                     clickListener.onClickItem(note)
@@ -59,8 +60,7 @@ class ThumbnailViewHolder(
                 }
             }
             setOnLongClickListener{
-                val curPos = layoutPosition
-                nViewModel.setNotePointed(curPos, note)
+                nViewModel.setNotePointed(layoutPosition, note)
                 if(nViewModel.getSelMode() == NoteViewModel.OFF){
                     setBackgroundToSel()    //prepare to enter multi sel mode
                     longClickListener.onLongClickItem(note)

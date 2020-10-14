@@ -1,4 +1,4 @@
-package com.jonathan.trace.study.trace.coketlist.adapter.thumbnail
+package com.jonathan.trace.study.trace.coketlist.thumbnail.adapter
 
 import android.graphics.Color
 import android.util.Log
@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Deprecated("Use separate ViewHolder rather than separate adapters")
 class ThumbnailPrivateAdapter(
     private var thumbnails: MutableList<Note> = mutableListOf<Note>(),
     private val listener: ThumbnailAdapterListener,
