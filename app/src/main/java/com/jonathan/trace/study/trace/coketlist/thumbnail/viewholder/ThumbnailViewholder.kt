@@ -1,7 +1,10 @@
 package com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder
 
 import android.graphics.Color
+import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +26,9 @@ class ThumbnailViewHolder(
     private val nViewModel: NoteViewModel
             by lazy{ViewModelProvider(itemView.context as ViewModelStoreOwner).get(NoteViewModel::class.java)}
 
+    private val disappear by lazy{AnimationUtils.loadAnimation(itemView.context, R.anim.global_disappear)}
+    private val appear by lazy{AnimationUtils.loadAnimation(itemView.context, R.anim.btn_appear)}
+
     fun bind(note: Note, position: Int, clickListener: ThumbnailAdapter.ThumbnailAdapterListener, longClickListener: ThumbnailAdapter.ThumbnailAdapterLongListener){
         val curDate = getDateTime().substring(0, 10)
         val noteDate = note.dateTimeModified.substring(0, 10)
@@ -34,11 +40,17 @@ class ThumbnailViewHolder(
         val cv = itemView.findViewById<CardView>(R.id.cv_thumbnail)
         cv.setBackgroundColor(Color.parseColor(note.color))
 
+        Log.d("", "position: $position, selected: ${nViewModel.selected[position]}")
         itemView.apply{
             tv_thumbnail_title.text = note.title
             tv_thumbnail_body.text = note.body
-            if(nViewModel.selected[position] != null)
+            iv_cover.visibility = View.GONE
+            iv_checkbox.visibility = View.GONE
+
+            if(nViewModel.selected[position] != null) {
+                Log.d("","> position $position is not null")
                 setBackgroundToSel()
+            }
 
             nViewModel.selMode.observe(context as LifecycleOwner){
                 if(it == NoteViewModel.OFF)
@@ -49,6 +61,7 @@ class ThumbnailViewHolder(
                 val curPos = layoutPosition
 
                 nViewModel.setNotePointed(curPos, note)
+
                 if(nViewModel.getSelMode() == NoteViewModel.OFF)
                     clickListener.onClickItem(note)
                 else{
@@ -61,6 +74,7 @@ class ThumbnailViewHolder(
             }
             setOnLongClickListener{
                 nViewModel.setNotePointed(layoutPosition, note)
+
                 if(nViewModel.getSelMode() == NoteViewModel.OFF){
                     setBackgroundToSel()    //prepare to enter multi sel mode
                     longClickListener.onLongClickItem(note)
@@ -71,11 +85,19 @@ class ThumbnailViewHolder(
     }
 
     private fun setBackgroundToSel(){
-        itemView.alpha = 0.6f
+        itemView.apply{
+            iv_cover.visibility = View.VISIBLE
+            iv_checkbox.visibility = View.VISIBLE
+            iv_checkbox.startAnimation(appear)
+        }
     }
 
     private fun setBackgroundToNotSel(){
-        itemView.alpha = 1f
+        itemView.apply{
+            iv_cover.visibility = View.GONE
+            iv_checkbox.visibility = View.GONE
+            iv_checkbox.startAnimation(disappear)
+        }
     }
 
     private fun getDateTime(): String{

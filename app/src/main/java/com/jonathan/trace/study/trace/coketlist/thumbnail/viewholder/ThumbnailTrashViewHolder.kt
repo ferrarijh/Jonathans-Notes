@@ -46,9 +46,7 @@ class ThumbnailTrashViewHolder(
                 longClickListener.onLongClickItem(note)
                 true
             }
-
         }
-
     }
 
 

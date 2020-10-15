@@ -4,11 +4,14 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -38,8 +41,11 @@ class HomeFragment : Fragment() {
     private lateinit var sortDialog: AlertDialog
     private lateinit var pwDialog: PwDialog
     private lateinit var deleteMultiDialog: DeleteMultiDialog
-    private val btnDeleteMulti by lazy{requireActivity().findViewById<Button>(R.id.btn_delete_multi)}
+    private val btnDeleteMulti by lazy{requireActivity().findViewById<CardView>(R.id.cv_delete_multi)}
     private val parent by lazy{requireActivity() as AppCompatActivity}
+
+    private val appear: Animation by lazy{ AnimationUtils.loadAnimation(context, R.anim.btn_appear)}
+    private val disappear: Animation by lazy{ AnimationUtils.loadAnimation(context, R.anim.global_disappear)}
 
     private val sharedPreference by lazy {
         parent.getSharedPreferences("Sort", Context.MODE_PRIVATE)
@@ -70,9 +76,11 @@ class HomeFragment : Fragment() {
         setDialog()
         setFAB()
         setAppBar()
-        setNavView()
-        setDrawer()
+        //setNavView()
+        setDrawer(true)
         setWithMultiSelState()
+        setBtn()
+        setAnimation()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -82,18 +90,20 @@ class HomeFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.action_search -> {
-                fabAdd.hide()
-
-                val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment()
-                findNavController().navigate(action)
-            }
-            R.id.action_sort -> {
-                sortDialog.show()
-            }
+            R.id.action_search -> goToSearch()
+            R.id.action_sort -> sortDialog.show()
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setBtn(){
+        btnDeleteMulti.setOnClickListener{
+            if(nViewModel.selected.isEmpty())
+                Toast.makeText(context, getString(R.string.nothing_to_delete), Toast.LENGTH_SHORT).show()
+            else
+                deleteMultiDialog.show()
+        }
     }
 
     private fun setViewModel(){
@@ -127,27 +137,24 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setDrawer(){
+    private fun setDrawer(toggle: Boolean){
         val drawer = requireActivity().findViewById<DrawerLayout>(R.id.layout_drawer)
-        if(drawer.getDrawerLockMode(GravityCompat.START) == DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        if(toggle)
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+        else
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
     }
 
     private fun setNavView(){
-        requireActivity().findViewById<NavigationView>(R.id.nv).setNavigationItemSelectedListener {
-            requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
+        parent.findViewById<NavigationView>(R.id.nv).setNavigationItemSelectedListener {
+            parent.findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
             when(it.itemId){
                 R.id.item_private_note -> {
-                    fabAdd.hide()
-
-                    val action = HomeFragmentDirections.actionHomeFragmentToPrivateFragment()
-                    findNavController().navigate(action)
+                    goToPrivate()
                 }
                 R.id.item_trash_can -> {
-                    fabAdd.hide()
-
-                    val action = HomeFragmentDirections.actionHomeFragmentToTrashCanFragment()
-                    findNavController().navigate(action)
+                    goToTrashCan()
                 }
             }
             requireActivity().findViewById<DrawerLayout>(R.id.layout_drawer).close()
@@ -168,7 +175,7 @@ class HomeFragment : Fragment() {
         val toolBar = parent.findViewById<Toolbar>(R.id.toolbar)
         val ivHome = toolBar.findViewById<ImageView>(R.id.iv_hamburger)
         ivHome.let {
-            it.setImageResource(R.drawable.hamburger)
+            it.setImageResource(R.mipmap.ic_hamburger_foreground)
             it.setOnClickListener{_ ->
                 val drawer = parent.findViewById<DrawerLayout>(R.id.layout_drawer)
                 drawer.openDrawer(GravityCompat.START)
@@ -190,9 +197,7 @@ class HomeFragment : Fragment() {
             fabAdd.show()
 
         fabAdd.setOnClickListener{
-            fabAdd.hide()
-            val action = HomeFragmentDirections.actionHomeFragmentToEditNoteFragment()
-            findNavController().navigate(action)
+            goToEditNoteNew()
         }
 
         rv_notes.addOnScrollListener(object: RecyclerView.OnScrollListener() {
@@ -211,12 +216,12 @@ class HomeFragment : Fragment() {
     private fun setDialog() {
 
         //warnDialog
-        warnDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_deletion)) {  //pClickListener
+        warnDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_trash)) {  //pClickListener
             val selectedNote = nViewModel.getNotePointed()?.second
             selectedNote?.let {
                 it.trash = 1
                 nViewModel.update(it)
-                Toast.makeText(context, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.trashed), Toast.LENGTH_SHORT).show()
             }
             warnDialog.dismiss()
         }
@@ -237,16 +242,16 @@ class HomeFragment : Fragment() {
         }
 
         //selectDialog
-        val delete = getString(R.string.delete)
+        val trash = getString(R.string.trash)
         val setPw = getString(R.string.set_pw)
         val multiSel = getString(R.string.multi_sel)
 
-        val sel = arrayOf(multiSel, setPw, delete)
+        val sel = arrayOf(multiSel, setPw, trash)
         val builderSel = AlertDialog.Builder(requireContext())
         builderSel.setItems(sel) { _, i ->
             when (sel[i]) {
                 setPw -> pwDialog.show()
-                delete -> warnDeletion()
+                trash -> warnDeletion()
                 multiSel -> enterMultiSelMode()
             }
         }
@@ -290,7 +295,7 @@ class HomeFragment : Fragment() {
     private fun setWithMultiSelState(){
         //set delete-multi button
         if(nViewModel.getSelMode() == NoteViewModel.ON) {
-            btnDeleteMulti.visibility = View.VISIBLE
+            btnDeleteMulti.startAnimation(appear)
             fabAdd.hide()
             parent.supportActionBar!!.hide()
         }
@@ -298,18 +303,20 @@ class HomeFragment : Fragment() {
         nViewModel.selMode.observe(viewLifecycleOwner){
             if(it == NoteViewModel.ON) {
                 btnDeleteMulti.visibility = View.VISIBLE
+                btnDeleteMulti.startAnimation(appear)
+
                 fabAdd.hide()
                 parent.supportActionBar!!.hide()
+                setDrawer(false)
             }
             else {
-                btnDeleteMulti.visibility = View.GONE
+                if(btnDeleteMulti.visibility == View.VISIBLE)
+                    btnDeleteMulti.startAnimation(disappear)
+
                 fabAdd.show()
                 parent.supportActionBar!!.show()
+                setDrawer(true)
             }
-        }
-
-        btnDeleteMulti.setOnClickListener{
-            deleteMultiDialog.show()
         }
     }
 
@@ -337,12 +344,7 @@ class HomeFragment : Fragment() {
             ThumbnailAdapter.HOME,
             object : ThumbnailAdapter.ThumbnailAdapterListener {
                 override fun <T> onClickItem(item: T) {
-                    requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
-                    fabAdd.hide()
-
-                    val action = HomeFragmentDirections.actionHomeFragmentToEditNoteFragment()
-                    action.note = item as Note
-                    findNavController().navigate(action)
+                    goToEditNoteWith()
                 }
             },
             object : ThumbnailAdapter.ThumbnailAdapterLongListener {
@@ -361,4 +363,56 @@ class HomeFragment : Fragment() {
             rv_notes.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
     }
 
+    private fun setAnimation(){
+        disappear.setAnimationListener(object: Animation.AnimationListener{
+            override fun onAnimationStart(animation: Animation?) {
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+                btnDeleteMulti.visibility = View.GONE
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+            }
+
+        })
+    }
+
+    private fun goToEditNoteNew(){
+        fabAdd.setOnClickListener(null) //to prevent crash on double click
+        fabAdd.hide()
+
+        val action = HomeFragmentDirections.actionHomeFragmentToEditNoteFragment()
+        action.isNew = true
+        findNavController().navigate(action)
+    }
+
+    private fun goToEditNoteWith(){
+        fabAdd.hide()
+
+        val action = HomeFragmentDirections.actionHomeFragmentToEditNoteFragment()
+        findNavController().navigate(action)
+    }
+
+    private fun goToTrashCan(){
+        fabAdd.hide()
+
+        val action = HomeFragmentDirections.actionHomeFragmentToTrashCanFragment()
+        findNavController().navigate(action)
+    }
+
+    private fun goToPrivate(){
+        fabAdd.hide()
+
+        val action = HomeFragmentDirections.actionHomeFragmentToPrivateFragment()
+        findNavController().navigate(action)
+    }
+
+    private fun goToSearch(){
+        fabAdd.setOnClickListener(null) //to prevent crash on double click
+        fabAdd.hide()
+
+        val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment()
+        findNavController().navigate(action)
+    }
 }

@@ -1,5 +1,6 @@
 package com.jonathan.trace.study.trace.coketlist
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -25,12 +27,17 @@ class ViewModeFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setCanvas()
+        setDrawer()
+        setAppBar()
+    }
+
+    private fun setCanvas(){
         val note = ViewModeFragmentArgs.fromBundle(requireArguments()).note
         tv_note_title.text = note.title
         tv_note_body.text = note.body
         tv_note_body.movementMethod = ScrollingMovementMethod()
-        setDrawer()
-        setAppBar()
+        cv_note_view_only.setCardBackgroundColor(Color.parseColor(note.color))
     }
 
     private fun setAppBar(){

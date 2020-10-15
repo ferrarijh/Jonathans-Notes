@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/item_private_note"
-        android:title="@string/lock"
+        android:title="@string/private_note"
         android:icon="@drawable/lock"
         android:iconTint="@color/dark"/>
     <item
         android:id="@+id/item_trash_can"
-        android:title="@string/trashcan"
+        android:title="@string/trash_can"
         android:icon="@drawable/trash"
         android:iconTint="@color/dark"/>
 </menu>

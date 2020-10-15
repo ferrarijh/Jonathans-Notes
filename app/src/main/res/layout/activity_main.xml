@@ -39,7 +39,7 @@
                     android:paddingRight="10dp"
                     android:scaleX="0.8"
                     android:scaleY="0.8"
-                    android:src="@drawable/hamburger" />
+                    android:src="@mipmap/ic_hamburger_foreground" />
 
             </androidx.appcompat.widget.Toolbar>
 
@@ -129,23 +129,37 @@
                 app:borderWidth="0dp"
                 android:visibility="invisible"/>
         </LinearLayout>
-        <Button
-            android:id="@+id/btn_delete_multi"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_delete_multi"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            app:cardCornerRadius="5dp"
+            android:backgroundTint="@color/titleColor"
+            app:cardElevation="10dp"
             android:layout_gravity="bottom"
-            android:text="DELETE MULTI"
-            android:visibility="invisible"/>
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="match_parent"
+                android:background="@android:color/transparent"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_move_to_trash_foreground"/>
+        </androidx.cardview.widget.CardView>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nv"
         android:layout_width="250dp"
         android:layout_height="match_parent"
+
         android:layout_gravity="start"
-        app:menu="@menu/menu_drawer"
         app:headerLayout="@layout/header"
         android:background="@color/background">
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="100dp"
+            layout="@layout/layout_drawer"/>
 
     </com.google.android.material.navigation.NavigationView>
 

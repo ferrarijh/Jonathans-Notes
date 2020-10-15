@@ -9,19 +9,19 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.layout_drawer.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
-    private lateinit var mViewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
-
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_nav_host) as NavHostFragment
         navController = navHostFragment.navController
+
+        setDrawerItems()
     }
 
     override fun onBackPressed() {
@@ -31,4 +31,14 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
     }
 
+    private fun setDrawerItems(){
+        ll_item_private.setOnClickListener{
+            fab_add.hide()
+            navController.navigate(HomeFragmentDirections.actionHomeFragmentToPrivateFragment())
+        }
+        ll_item_trash.setOnClickListener{
+            fab_add.hide()
+            navController.navigate(HomeFragmentDirections.actionHomeFragmentToTrashCanFragment())
+        }
+    }
 }

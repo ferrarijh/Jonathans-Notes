@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cv_note_view_only"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="20dp"
+    android:layout_margin="10dp"
     app:cardCornerRadius="5dp"
     app:cardElevation="3dp">
     <androidx.core.widget.NestedScrollView
@@ -18,9 +19,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
+                android:textSize="16sp"
                 android:text="TITLE"
                 android:textStyle="bold"
                 android:textColor="@color/trashedText"/>
+
             <TextView
                 android:id="@+id/tv_note_body"
                 android:layout_width="match_parent"
@@ -28,9 +31,11 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
                 android:layout_marginBottom="15dp"
-                android:text="@string/shakespeare"
+                android:lineSpacingMultiplier="1.6"
                 android:scrollbars="vertical"
-                android:textColor="@color/trashedText" />
+                android:text="@string/shakespeare"
+                android:textColor="@color/trashedText"
+                android:textSize="15sp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

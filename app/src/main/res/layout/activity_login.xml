@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/title_plain" />
+        app:srcCompat="@drawable/jn_header_shallow" />
 
     <EditText
         android:id="@+id/et_login_email"

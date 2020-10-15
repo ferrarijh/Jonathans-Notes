@@ -90,7 +90,7 @@ class SearchFragment: Fragment(){
 
     private fun setDialog(){
         //delete dialog
-        deleteDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_deletion)){  //pClickListener
+        deleteDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_trash)){  //pClickListener
             val notePointed = nViewModel.getNotePointed()?.second
             notePointed?.let {
                 it.trash = 1
@@ -107,6 +107,7 @@ class SearchFragment: Fragment(){
                 Toast.makeText(context, getString(R.string.moved_to_trash), Toast.LENGTH_SHORT).show()
             }
             deleteDialog.dismiss()
+            nViewModel.setSelMode(NoteViewModel.OFF)
         }
 
         //password dialog
@@ -120,20 +121,23 @@ class SearchFragment: Fragment(){
             } else {
                 setPw(pw)
                 pwDialog.dismiss()
+                nViewModel.setSelMode(NoteViewModel.OFF)
             }
         }
 
         //options Dialog
         val setPw = getString(R.string.set_pw)
-        val delete = getString(R.string.delete)
-        val options = arrayOf(delete, setPw)
+        val trash = getString(R.string.trash)
+        val options = arrayOf(trash, setPw)
 
         val oBuilder = AlertDialog.Builder(requireContext())
         oBuilder.setItems(options){ _, i ->
             when(options[i]){
                 setPw -> pwDialog.show()
-                delete -> deleteDialog.show()
+                trash -> deleteDialog.show()
             }
+        }.setOnDismissListener{
+            nViewModel.setSelMode(NoteViewModel.OFF)
         }
         optionsDialog = oBuilder.create()
     }
@@ -153,7 +157,7 @@ class SearchFragment: Fragment(){
             ThumbnailAdapter.HOME,
             object: ThumbnailAdapter.ThumbnailAdapterListener{
                 override fun <T> onClickItem(item: T) {
-                    goToEditNoteWith(item as Note)
+                    goToEditNoteWith()
                 }
             },
             object: ThumbnailAdapter.ThumbnailAdapterLongListener{
@@ -186,9 +190,10 @@ class SearchFragment: Fragment(){
                     val notes = fViewModel.curNotes.value!!
                     notes.clear()
                     if (!it.isBlank()){
+                        val str = s.toString().toLowerCase()
                         val notesAll = fViewModel.curNotesAll!!.value!!
                         notesAll.forEach{n ->
-                            if(it in n.title || it in n.body){
+                            if(str in n.title.toLowerCase() || str in n.body.toLowerCase()){
                                 notes.add(n)
                             }
                         }
@@ -209,9 +214,8 @@ class SearchFragment: Fragment(){
         fViewModel.curNotes.value = fViewModel.curNotes.value!!
     }
 
-    private fun goToEditNoteWith(item: Note){
+    private fun goToEditNoteWith(){
         val action = SearchFragmentDirections.actionSearchFragmentToEditNoteFragment()
-        action.note = item
         action.fromSearch = true
 
         requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)

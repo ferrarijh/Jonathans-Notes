@@ -28,13 +28,12 @@
         android:label="EditNote"
         tools:layout="@layout/fragment_edit_note">
         <argument
-            app:argType="com.jonathan.trace.study.trace.coketlist.room.Note"
-            android:name="Note"
-            app:nullable="true"
-            android:defaultValue="@null" />
-        <argument
             app:argType="boolean"
             android:name="FromSearch"
+            android:defaultValue="false"/>
+        <argument
+            app:argType="boolean"
+            android:name="IsNew"
             android:defaultValue="false"/>
 
     </fragment>

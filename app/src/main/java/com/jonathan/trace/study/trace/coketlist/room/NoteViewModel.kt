@@ -33,6 +33,8 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
     fun getAllNotesByBody() = repository.getAllNotesByBody()
     fun getAllNotesByColor() = repository.getAllNotesByColor()
 
+    fun getIdLastSaved(): LiveData<Int> = repository.getIdLastSaved()
+
     init{
         val noteDao = NoteDatabase.getDatabase(app).getNoteDao()
         repository = NoteRepository(noteDao)
@@ -59,9 +61,9 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
         }
     }
 
-    fun deleteAll(){
+    fun deleteAllTrashed(){
         viewModelScope.launch(Dispatchers.IO){
-            repository.deleteAll()
+            repository.deleteAllTrashed()
         }
     }
 

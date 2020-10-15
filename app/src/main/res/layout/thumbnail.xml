@@ -8,42 +8,61 @@
         android:id="@+id/cv_thumbnail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:cardElevation="1dp"
+        android:layout_margin="3dp"
+        app:cardElevation="1.5dp"
         app:cardCornerRadius="0dp">
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tv_thumbnail_date"
+            android:layout_height="wrap_content">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="3dp"
-                android:gravity="end"
-                android:text="2000-00-00"
-                android:textSize="12sp"
-                android:textColor="@color/dateText"
-                android:ellipsize="end"/>
-            <TextView
-                android:id="@+id/tv_thumbnail_title"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tv_thumbnail_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:paddingTop="3dp"
+                    android:gravity="end"
+                    android:text="2000-00-00"
+                    android:textSize="12sp"
+                    android:textColor="@color/dateText"
+                    android:ellipsize="end"/>
+                <TextView
+                    android:id="@+id/tv_thumbnail_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="3dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:textStyle="bold"
+                    android:text="Title"/>
+                <TextView
+                    android:id="@+id/tv_thumbnail_body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:maxLines="5"
+                    android:lineSpacingMultiplier="1.5"
+                    android:text="@string/chunhyang"
+                    android:ellipsize="end" />
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/iv_cover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.3"
+                android:src="#000000"/>
+            <ImageView
+                android:id="@+id/iv_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:textStyle="bold"
-                android:text="Title"/>
-            <TextView
-                android:id="@+id/tv_thumbnail_body"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:maxLines="5"
-                android:lineHeight="25sp"
-                android:text="@string/chunhyang"
-                android:ellipsize="end" />
-        </LinearLayout>
+                android:src="@drawable/ic_check_box_black"
+                android:layout_gravity="top|end"
+                android:layout_margin="15dp"
+                android:alpha="0.5"/>
+        </FrameLayout>
 
     </androidx.cardview.widget.CardView>
 

@@ -1,15 +1,21 @@
 package com.jonathan.trace.study.trace.coketlist.viewmodel
 
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.room.Note
 
 class FragmentStateViewModel: ViewModel(){
 
     //for EditNoteFragment
     val isPaletteOpen = MutableLiveData<Boolean>()
+    val colorSelected = MutableLiveData<String>()
+    init{
+        isPaletteOpen.value = false
+    }
 
     //for SearchFragment
     val curNotes = MutableLiveData<MutableList<Note>>()
@@ -18,9 +24,6 @@ class FragmentStateViewModel: ViewModel(){
         get() = _curNotesAll
 
     init{
-        isPaletteOpen.value = false
-        Log.d("", "ViewModel() initialized.")
-
         curNotes.value = mutableListOf()
     }
 

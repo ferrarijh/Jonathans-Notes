@@ -31,6 +31,8 @@ interface NoteDao{
     @Query("SELECT * FROM note_table WHERE pw IS NOT NULL ORDER BY dateTimeModified DESC")
     fun getAllPrivateNotes(): LiveData<List<Note>>
 
+    @Query("SELECT id FROM note_table ORDER BY dateTimeModified DESC LIMIT 1")
+    fun getIdLastSaved(): LiveData<Int>
 
     @Insert
     suspend fun addMultipleNotes(vararg note: Note)
@@ -42,5 +44,5 @@ interface NoteDao{
     fun delete(entity: Note)
 
     @Query("DELETE FROM note_table WHERE trash = 1")
-    fun deleteAll()
+    fun deleteAllTrashed()
 }

@@ -1,9 +1,8 @@
 package com.jonathan.trace.study.trace.coketlist
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +13,10 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -32,13 +33,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class EditNoteFragment: Fragment(){
-    private var mNote: Note? = null
+    private var isNew = false
     private lateinit var warnDialog: MyDialog
-    private lateinit var mViewModel: NoteViewModel
-    private lateinit var fViewModel: FragmentStateViewModel
+    private val nViewModel by lazy{ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)}
+    private val fViewModel by lazy{ViewModelProvider(this).get(FragmentStateViewModel::class.java)}
     private val isPaletteOpen = MutableLiveData<Boolean>()
     private var justInitialized = true
-    private lateinit var colorSelected: String
+
+    private lateinit var colorSelected: MutableLiveData<String>
 
     private val fabSave: FloatingActionButton by lazy{ requireActivity().findViewById(R.id.fab_save) }
     private val fabColors: FloatingActionButton by lazy{ requireActivity().findViewById(R.id.fab_colors)}
@@ -53,13 +55,6 @@ class EditNoteFragment: Fragment(){
     private val down: Animation by lazy { AnimationUtils.loadAnimation(context, R.anim.fab_down)}
     private val init: Animation by lazy { AnimationUtils.loadAnimation(context, R.anim.fab_init)}
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        @SuppressLint("ResourceType")
-        colorSelected = resources.getString(R.color.white)
-        setOnBackPressed()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,17 +65,35 @@ class EditNoteFragment: Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setViewModel()
-        setNote()
+        setNoteContent()
         setBackground()
         setFAB()
         setDialog()
         setAppBar()
         setDrawer()
+        setOnBackPressed()
     }
 
     private fun setBackground(){
-        cv_edit_note.setCardBackgroundColor(Color.parseColor(colorSelected))
+        colorSelected = fViewModel.colorSelected
+        colorSelected.observe(viewLifecycleOwner){
+            cv_edit_note.setCardBackgroundColor(Color.parseColor(it))
+            Log.d("", "color changed to: $it")
+        }
+
+        if(isNew) {
+            if (colorSelected.value == null)
+                colorSelected.value = colorResToStr(R.color.white)
+        }else{
+            if(colorSelected.value == null)
+                colorSelected.value = nViewModel.getNotePointed()!!.second.color
+            else
+                colorSelected.value = colorSelected.value
+        }
+
+        Log.d("", "colorSelected.value: ${colorSelected.value}")
+
+
     }
 
     private fun setDrawer(){
@@ -102,16 +115,17 @@ class EditNoteFragment: Fragment(){
         //ImageView used as button since navigation icon does not support long click
         ivHome.apply{
             setOnClickListener{
-                if(!isEdited()){
+                if(!isEdited())
                     goBack()
-                }
                 else
                     Toast.makeText(context, getString(R.string.long_click), Toast.LENGTH_SHORT).show()
             }
             setOnLongClickListener{
-                if(isEdited())
+                if(isEdited() && !isEmpty())
                     saveNote()
-                else
+                else if(isEmpty()) {
+                    Toast.makeText(context, getString(R.string.cant_save_empty), Toast.LENGTH_SHORT).show()
+                }else
                     Toast.makeText(context, getString(R.string.not_edited), Toast.LENGTH_SHORT).show()
                 goBack()
                 true
@@ -120,47 +134,53 @@ class EditNoteFragment: Fragment(){
     }
 
     private fun isEdited(): Boolean{
-        mNote?.let {
-            val oldTitle = mNote!!.title
-            val oldBody = mNote!!.body
-            val newTitle = et_title.text.toString()
-            val newBody = et_body.text.toString()
-            val oldColor = mNote!!.color
-            return newBody != oldBody || oldTitle != newTitle || oldColor != colorSelected
-        }
-        return !et_title.text.isNullOrBlank() || !et_body.text.isNullOrBlank()
+        val curNote = nViewModel.getNotePointed()!!.second
+
+        val oldTitle = curNote.title
+        val oldBody = curNote.body
+        val oldColor = curNote.color
+
+        val newTitle = et_title.text.toString()
+        val newBody = et_body.text.toString()
+
+        return newBody != oldBody || oldTitle != newTitle || oldColor != colorSelected.value
     }
 
     private fun setOnBackPressed(){
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            if(mNote != null){
-                if(isEdited()) {
-                    warnDialog.show()
-                    return@addCallback
-                }
-            }else{
-                if(et_title.text.isNotBlank() || et_body.text.isNotBlank()){
-                    warnDialog.show()
-                    return@addCallback
-                }
-            }
-            goBack()
+            if(isEdited())
+                warnDialog.show()
+            else
+                goBack()
         }
     }
 
-    private fun setNote(){
-        arguments?.let{
-            mNote = EditNoteFragmentArgs.fromBundle(it).note
-            mNote?.let{ n ->
-                et_title.setText(n.title)
-                et_body.setText(n.body)
-                colorSelected = n.color
-            }
-        }
+    private fun setNoteContent(){
+        isNew = EditNoteFragmentArgs.fromBundle(requireArguments()).isNew
+
+        if(!isNew) {
+            val note = nViewModel.getNotePointed()!!.second
+            et_title.setText(note.title)
+            et_body.setText(note.body)
+        }else
+            nViewModel.setNotePointed(-1,
+                Note(0,
+                    "",
+                    "",
+                    "",
+                    "",
+                    0,
+                    colorResToStr(R.color.white),
+                    null
+                ))
     }
 
-    @SuppressLint("ResourceType")
     private fun setFAB(){
+        //palette
+        fViewModel.isPaletteOpen.value?.let{
+            isPaletteOpen.value = it
+        }
+
         fabSave.show()
         fabColors.show()
 
@@ -179,9 +199,11 @@ class EditNoteFragment: Fragment(){
                     Toast.makeText(context, getString(R.string.not_edited), Toast.LENGTH_SHORT).show()
             }
             setOnLongClickListener{
-                if(isEdited())
+                if(isEdited() && !isEmpty())
                     saveNote()
-                else
+                else if(isEmpty()) {
+                    Toast.makeText(context, getString(R.string.cant_save_empty), Toast.LENGTH_SHORT).show()
+                }else
                     Toast.makeText(context, getString(R.string.not_edited), Toast.LENGTH_SHORT).show()
                 goBack()
                 true
@@ -206,88 +228,91 @@ class EditNoteFragment: Fragment(){
         }
 
         fabCoral.setOnClickListener{
-            colorSelected = resources.getString(R.color.coral)
-            cv_edit_note.setCardBackgroundColor(Color.parseColor(colorSelected))
+            colorSelected.value = colorResToStr(R.color.coral)
         }
         fabLemon.setOnClickListener{
-            colorSelected = resources.getString(R.color.lemon)
-            cv_edit_note.setCardBackgroundColor(Color.parseColor(colorSelected))
+            colorSelected.value = colorResToStr(R.color.lemon)
         }
         fabMint.setOnClickListener{
-            colorSelected = resources.getString(R.color.mint)
-            cv_edit_note.setCardBackgroundColor(Color.parseColor(colorSelected))
+            colorSelected.value = colorResToStr(R.color.mint)
         }
         fabWhite.setOnClickListener{
-            colorSelected = resources.getString(R.color.white)
-            cv_edit_note.setCardBackgroundColor(Color.parseColor(colorSelected))
+            colorSelected.value = colorResToStr(R.color.white)
         }
     }
 
     private fun openPalette(){
-        fabColors.animation = expand
+        fabColors.startAnimation(expand)
         fabCoral.show()
-        fabCoral.animation = up
+        fabCoral.startAnimation(up)
         fabLemon.show()
-        fabLemon.animation = up
+        fabLemon.startAnimation(up)
         fabMint.show()
-        fabMint.animation = up
+        fabMint.startAnimation(up)
         fabWhite.show()
-        fabWhite.animation = up
+        fabWhite.startAnimation(up)
     }
 
     private fun closePalette(){
-        fabColors.animation = shrink
-        fabCoral.animation = down
+        fabColors.startAnimation(shrink)
+        fabCoral.startAnimation(down)
         fabCoral.hide()
-        fabLemon.animation = down
+        fabLemon.startAnimation(down)
         fabLemon.hide()
-        fabMint.animation = down
+        fabMint.startAnimation(down)
         fabMint.hide()
-        fabWhite.animation = down
+        fabWhite.startAnimation(down)
         fabWhite.hide()
     }
 
-    @SuppressLint("ResourceType")
     private fun saveNote(){
         val title = et_title.text.toString().trim()
         val body = et_body.text.toString().trim()
         val dateTime = getDateTime()
 
-        if(body.isBlank() && body.isBlank()){
-            Toast.makeText(context, getString(R.string.cant_save_empty), Toast.LENGTH_SHORT).show()
-            return
-        }
+        if(nViewModel.getNotePointed()!!.second.id == 0) {
+            val curNote = Note(0, title, body, dateTime, dateTime, 0, colorSelected.value!!)
+            Log.d("","saving note with id: ${nViewModel.getNotePointed()!!.second.id }")
 
-        if(mNote == null) {
-            mNote = Note(0, title, body, dateTime, dateTime, 0, colorSelected)
+            //fetch id immediately after saving new unsaved note
+            var curIdLive: LiveData<Int>
             CoroutineScope(Dispatchers.IO).launch {
-                mViewModel.addNote(mNote!!)
+                nViewModel.addNote(curNote)
+            }.invokeOnCompletion {
+                curIdLive = nViewModel.getIdLastSaved()
+                CoroutineScope(Dispatchers.Main).launch {
+                    curIdLive.observe(viewLifecycleOwner) {
+                        curNote.id = it
+                        Log.d("","observed, notePointed id is now: ${nViewModel.getNotePointed()!!.second.id }")
+                        curIdLive.removeObservers(viewLifecycleOwner)
+                    }
+                }
             }
+            nViewModel.setNotePointed(-1, curNote)  //pos -1 ONLY when saving new note
             Toast.makeText(context, getString(R.string.saved), Toast.LENGTH_SHORT).show()
         }else{
-            mNote!!.title = title
-            mNote!!.body = body
-            mNote!!.dateTimeModified = dateTime
-            mNote!!.color = colorSelected
+            val curNote = nViewModel.getNotePointed()!!.second
+            curNote.title = title
+            curNote.body = body
+            curNote.dateTimeModified = dateTime
+            curNote.color = colorSelected.value!!
             CoroutineScope(Dispatchers.IO).launch {
-                mViewModel.update(mNote!!)
+                nViewModel.update(curNote)
             }
             Toast.makeText(context, getString(R.string.saved), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun isEmpty(): Boolean {
+        val title = et_title.text.toString().trim()
+        val body = et_body.text.toString().trim()
+        return title.isBlank() && body.isBlank()
     }
 
     private fun setDialog(){
         warnDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_cancel_edit)){
             goBack()
             warnDialog.dismiss()
-        }
-    }
-
-    private fun setViewModel(){
-        mViewModel = ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)
-        fViewModel = ViewModelProvider(this).get(FragmentStateViewModel::class.java)
-        fViewModel.isPaletteOpen.value?.let{
-            isPaletteOpen.value = it
         }
     }
 
@@ -314,4 +339,7 @@ class EditNoteFragment: Fragment(){
         findNavController().navigateUp()
     }
 
+    private fun colorResToStr(colorRes: Int): String{
+        return String.format("#%08x", ContextCompat.getColor(requireContext(), colorRes) and 0xffffffff.toInt())
+    }
 }

@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -24,7 +25,7 @@ import kotlinx.android.synthetic.main.fragment_trash_can.*
 
 class TrashCanFragment : Fragment() {
 
-    private lateinit var nViewModel: NoteViewModel
+    private val nViewModel by lazy{ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)}
     private lateinit var notes: LiveData<List<Note>>
     private lateinit var adapter: ThumbnailAdapter
     private lateinit var warnDialog: MyDialog
@@ -42,7 +43,6 @@ class TrashCanFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        nViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
         setNotes()
         setDialog()
         setAdapter()
@@ -83,7 +83,7 @@ class TrashCanFragment : Fragment() {
         val toolBar = parent.findViewById<Toolbar>(R.id.toolbar)
         parent.setSupportActionBar(toolBar)
         toolBar.setNavigationIcon(R.drawable.back)
-        toolBar.navigationIcon?.setTint(resources.getColor(R.color.icons))
+        toolBar.navigationIcon?.setTint(ContextCompat.getColor(requireContext(), R.color.icons))
         toolBar.setNavigationOnClickListener{
             findNavController().navigateUp()
         }
@@ -114,7 +114,7 @@ class TrashCanFragment : Fragment() {
         selectDialog = builder.create()
 
         warnClearDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_clear_all)){
-            nViewModel.deleteAll()
+            nViewModel.deleteAllTrashed()
             Toast.makeText(context, getString(R.string.cleared), Toast.LENGTH_SHORT).show()
             warnClearDialog.dismiss()
         }
@@ -124,6 +124,7 @@ class TrashCanFragment : Fragment() {
         val notePointed = nViewModel.getNotePointed()!!.second
         notePointed.trash = 0
         nViewModel.update(notePointed)
+        Toast.makeText(context, getString(R.string.note_recovered), Toast.LENGTH_SHORT).show()
     }
 
     private fun setAdapter(){
@@ -133,12 +134,11 @@ class TrashCanFragment : Fragment() {
             ThumbnailAdapter.TRASH,
             object: ThumbnailAdapter.ThumbnailAdapterListener{
                 override fun <T> onClickItem(item: T) {
-                    goToViewMode(item as Note)
+                    goToViewMode()
                 }
             },
             object: ThumbnailAdapter.ThumbnailAdapterLongListener{
                 override fun <T> onLongClickItem(item: T) {
-                    //selectedNote = item as Note
                     selectDialog.show()
                 }
             })
@@ -151,8 +151,9 @@ class TrashCanFragment : Fragment() {
             rv_notes_trash.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
     }
 
-    private fun goToViewMode(item: Note){
-        val action = TrashCanFragmentDirections.actionTrashCanFragmentToViewModeFragment(item)
+    private fun goToViewMode(){
+        val note = nViewModel.getNotePointed()!!.second
+        val action = TrashCanFragmentDirections.actionTrashCanFragmentToViewModeFragment(note)
         requireActivity().findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
         findNavController().navigate(action)
     }

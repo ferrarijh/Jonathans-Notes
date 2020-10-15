@@ -8,8 +8,8 @@
         android:id="@+id/cv_thumbnail_trash"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:cardElevation="1dp"
+        android:layout_margin="3dp"
+        app:cardElevation="1.5dp"
         app:cardCornerRadius="0dp">
         <LinearLayout
             android:layout_width="match_parent"
@@ -19,9 +19,8 @@
                 android:id="@+id/tv_thumbnail_trash_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
                 android:layout_marginEnd="5dp"
-                android:layout_marginTop="3dp"
+                android:paddingTop="3dp"
                 android:gravity="end"
                 android:text="2000-00-00"
                 android:textSize="12sp"
@@ -30,6 +29,7 @@
                 android:id="@+id/tv_thumbnail_trash_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingTop="3dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:textStyle="bold"
@@ -38,10 +38,11 @@
                 android:id="@+id/tv_thumbnail_trash_body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:padding="10dp"
                 android:maxLines="5"
-                android:lineHeight="25sp"
-                android:textColor="@color/trashedText" />
+                android:lineSpacingMultiplier="1.4"
+                android:textColor="@color/trashedText"
+                android:ellipsize="end"/>
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"

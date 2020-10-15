@@ -1,8 +1,6 @@
 package com.jonathan.trace.study.trace.coketlist.room
 
-import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 
 class NoteRepository(private val noteDao: NoteDao){
     fun getAllNotes(): LiveData<List<Note>> = noteDao.getAllNotes()
@@ -13,6 +11,8 @@ class NoteRepository(private val noteDao: NoteDao){
 
     fun getAllTrashNotes(): LiveData<List<Note>> = noteDao.getAllTrashNotes()
     fun getAllPrivateNotes(): LiveData<List<Note>> = noteDao.getAllPrivateNotes()
+
+    fun getIdLastSaved(): LiveData<Int> = noteDao.getIdLastSaved()
 
     suspend fun addNote(note: Note){
         noteDao.addNote(note)
@@ -26,7 +26,7 @@ class NoteRepository(private val noteDao: NoteDao){
         noteDao.delete(note)
     }
 
-    fun deleteAll(){
-        noteDao.deleteAll()
+    fun deleteAllTrashed(){
+        noteDao.deleteAllTrashed()
     }
 }

@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Coketlist</string>
+    <string name="app_name">조나단의 메모장</string>
+
     <string name="login">로그인</string>
     <string name="sign_up"><u>계정 만들기</u></string>
 
@@ -8,7 +9,7 @@
 
     <!-- RegisterActivity -->
     <string name="welcome">환영합니다 :)</string>
-    <string name="welcome_content"></string>
+
     <string name="name">이름</string>
     <string name="email">이메일</string>
     <string name="pw">비밀번호</string>
@@ -20,16 +21,16 @@
     <string name="search">검색</string>
 
     <!-- drawer -->
-    <string name="lock">비밀 노트</string>
-    <string name="trashcan">휴지통</string>
+    <string name="private_note">비밀 노트</string>
+    <string name="trash_can">휴지통</string>
     <string name="settings">설정</string>
 
     <!-- dialog -->
     <string name="warn_delete_multi">선택한 노트들을 휴지통에 넣나요?</string>
     <string name="warn_deletion_permanent_private">비밀 노트는 즉시 삭제됩니다.\n정말 삭제하나요?</string>
-    <string name="warn_deletion_permanent">노트를 영구히 삭제하나요?</string>
+    <string name="warn_deletion_permanent">노트를 영구삭제하나요?</string>
     <string name="warn_clear_all">휴지통을 비울까요?</string>
-    <string name="warn_deletion">노트를 삭제하나요?</string>
+    <string name="warn_trash">노트를 휴지통에 넣을까요?</string>
     <string name="warn_cancel_edit">편집을 취소하나요?</string>
     <string name="ok">확인</string>
     <string name="cancel">취소</string>
@@ -38,7 +39,7 @@
     <string name="recover">복원</string>
 
     <string name="multi_sel">여러개 선택</string>
-    <string name="delete">삭제</string>
+    <string name="trash">휴지통으로</string>
     <string name="set_pw">비밀번호 설정</string>
 
     <string name="sort_by_time_created">생성일자 기준</string>
@@ -57,7 +58,7 @@
     <string name="long_click">길게 눌러 저장하고 나가기</string>
     <string name="saved">저장!</string>
     <string name="moved_to_trash">노트를 휴지통에 넣었어요</string>
-    <string name="deleted">삭제됐습니다</string>
+    <string name="trashed">노트를 휴지통에 넣었어요</string>
     <string name="cant_save_empty">빈 노트는 저장되지 않아요</string>
 
     <string name="pw_confirm_mismatch">두 입력값이 다릅니다!</string>
@@ -68,10 +69,14 @@
     <string name="invalid_pw_note">비밀번호를 확인하세요</string>
 
     <string name="deleted_perma">노트를 삭제했습니다</string>
-    <string name="cleared">쓱싹</string>
+    <string name="cleared" translatable="false">🧹🧼🧹🧼</string>
     <string name="title">제목</string>
     <string name="body">내용을 입력하세요</string>
 
     <string name="lock_removed">잠금을 없앴습니다</string>
+
+    <string name="nothing_to_delete">선택된 노트가 없어요</string>
+
+    <string name="note_recovered">복원!</string>
 
 </resources>

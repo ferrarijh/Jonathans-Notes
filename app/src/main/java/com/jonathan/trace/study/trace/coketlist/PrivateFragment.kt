@@ -8,13 +8,13 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailPrivateAdapter
 import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.PwCheckDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
@@ -23,7 +23,7 @@ import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapt
 import kotlinx.android.synthetic.main.fragment_private.*
 
 class PrivateFragment: Fragment(){
-    private lateinit var nViewModel: NoteViewModel
+    private val nViewModel by lazy{ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)}
     private lateinit var privateNotes: LiveData<List<Note>>
     private lateinit var adapter: ThumbnailAdapter
     private lateinit var warnDeleteDialog: MyDialog
@@ -42,7 +42,6 @@ class PrivateFragment: Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        nViewModel = ViewModelProvider(requireActivity()).get(NoteViewModel::class.java)
         setNotes()
         setDialog()
         setAdapter()
@@ -72,7 +71,7 @@ class PrivateFragment: Fragment(){
         requireActivity().findViewById<ImageView>(R.id.iv_hamburger).setImageResource(android.R.color.transparent)
         val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
         toolBar.setNavigationIcon(R.drawable.back)
-        toolBar.navigationIcon?.setTint(resources.getColor(R.color.icons))
+        toolBar.navigationIcon?.setTint(ContextCompat.getColor(requireContext(), R.color.icons))
 
         toolBar.setNavigationOnClickListener{
             findNavController().navigateUp()
@@ -85,7 +84,7 @@ class PrivateFragment: Fragment(){
             val notePointed = nViewModel.getNotePointed()!!.second
             notePointed.let {
                 nViewModel.delete(it)
-                Toast.makeText(context, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.trashed), Toast.LENGTH_SHORT).show()
             }
             warnDeleteDialog.dismiss()
         }
@@ -100,24 +99,23 @@ class PrivateFragment: Fragment(){
                 val toolBar = requireActivity().findViewById<Toolbar>(R.id.toolbar)
                 toolBar.navigationIcon = null
 
-                val action = PrivateFragmentDirections.actionPrivateFragmentToEditNoteFragment()
-                action.note = notePointed
-                findNavController().navigate(action)
+                goToEditNote()
             }
             else
                 Toast.makeText(context, getString(R.string.invalid_pw_note), Toast.LENGTH_SHORT).show()
         }
 
+
         //remove pw dialog
         removeLockDialog = PwCheckDialog(requireContext()){
             val input = removeLockDialog.findViewById<EditText>(R.id.et_pw_check).text.toString()
-            val notePointed = nViewModel.getNotePointed()!!.second  //TODO("NullPointerException")
+            val notePointed = nViewModel.getNotePointed()!!.second
             if(input == notePointed.pw){
                 notePointed.pw = null
                 nViewModel.update(notePointed)
                 //TODO("will adapter update itself?")
 
-                pwCheckDialog.dismiss()
+                removeLockDialog.dismiss()
                 Toast.makeText(context, getString(R.string.lock_removed), Toast.LENGTH_SHORT).show()
             }
             else
@@ -139,7 +137,6 @@ class PrivateFragment: Fragment(){
         optionsDialog = oBuilder.create()
     }
 
-
     private fun setAdapter(){
         adapter = ThumbnailAdapter(
             privateNotes.value as MutableList<Note>? ?: mutableListOf<Note>(),
@@ -155,21 +152,6 @@ class PrivateFragment: Fragment(){
                     optionsDialog.show()
                 }
             })
-        /*
-        adapter = ThumbnailPrivateAdapter(
-            privateNotes.value as MutableList<Note>? ?: mutableListOf<Note>(),
-            object: ThumbnailPrivateAdapter.ThumbnailAdapterListener{
-                override fun <T> onClickItem(item: T) {
-                    pwCheckDialog.show()
-                }
-            },
-            object: ThumbnailPrivateAdapter.ThumbnailAdapterLongListener{
-                override fun <T> onLongClickItem(item: T) {
-                    optionsDialog.show()
-                }
-            })
-
-         */
 
         rv_notes_private.adapter = adapter
         val ori = requireActivity().resources.configuration.orientation
@@ -179,4 +161,9 @@ class PrivateFragment: Fragment(){
             rv_notes_private.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
     }
 
+
+    private fun goToEditNote(){
+        val action = PrivateFragmentDirections.actionPrivateFragmentToEditNoteFragment()
+        findNavController().navigate(action)
+    }
 }
