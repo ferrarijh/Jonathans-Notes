@@ -50,6 +50,7 @@ class HomeFragment : Fragment() {
     private val sharedPreference by lazy {
         parent.getSharedPreferences("Sort", Context.MODE_PRIVATE)
     }
+
     private val spEditor by lazy{sharedPreference.edit()}
 
     private lateinit var fabAdd: FloatingActionButton

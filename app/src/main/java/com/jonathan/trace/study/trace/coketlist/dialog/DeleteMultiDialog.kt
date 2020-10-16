@@ -32,7 +32,6 @@ class DeleteMultiDialog(
             val newX = context.resources.displayMetrics.widthPixels
             val newY = context.resources.displayMetrics.heightPixels
             setLayout((newX*0.9).toInt(), (newY*0.9).toInt())
-            Log.d("", "layout: $newX, $newY")
         }
 
         btn_delete_multi_positive.setOnClickListener(pClickListener)

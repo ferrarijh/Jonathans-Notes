@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"
-        app:srcCompat="@drawable/memo_short" />
+        app:srcCompat="@drawable/gradient_circle" />
 
     <ImageView
         android:id="@+id/iv_title"
