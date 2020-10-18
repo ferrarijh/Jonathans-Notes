@@ -25,16 +25,15 @@ class MyDialog(
             flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND
             dimAmount = 0.5f
             width = WindowManager.LayoutParams.MATCH_PARENT
-            height = WindowManager.LayoutParams.MATCH_PARENT
-            gravity = Gravity.BOTTOM
+            //height = WindowManager.LayoutParams.MATCH_PARENT
+            gravity = Gravity.CENTER
         }
 
         window?.apply {
             setBackgroundDrawableResource(android.R.color.transparent)
-            val newX = context.resources.displayMetrics.widthPixels
-            val newY = context.resources.displayMetrics.heightPixels
-            setLayout((newX*0.9).toInt(), (newY*0.9).toInt())
-            Log.d("", "layout: $newX, $newY")
+            //val newX = context.resources.displayMetrics.widthPixels
+            //val newY = context.resources.displayMetrics.heightPixels
+            //setLayout((newX*0.9).toInt(), (newY*0.9).toInt())
         }
 
         tv_dialog_title.text = title

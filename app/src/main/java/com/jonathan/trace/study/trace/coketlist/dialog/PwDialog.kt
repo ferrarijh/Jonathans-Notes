@@ -22,16 +22,16 @@ class PwDialog(
             flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND
             dimAmount = 0.5f
             width = WindowManager.LayoutParams.MATCH_PARENT
-            height = WindowManager.LayoutParams.MATCH_PARENT
+            //height = WindowManager.LayoutParams.MATCH_PARENT
             gravity = Gravity.CENTER
-            softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+            //softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         }
 
         window?.apply {
             setBackgroundDrawableResource(android.R.color.transparent)
-            val newX = context.resources.displayMetrics.widthPixels
-            val newY = context.resources.displayMetrics.heightPixels
-            setLayout((newX * 0.9).toInt(), (newY * 0.9).toInt())
+            //val newX = context.resources.displayMetrics.widthPixels
+            //val newY = context.resources.displayMetrics.heightPixels
+            //setLayout((newX * 0.9).toInt(), (newY * 0.9).toInt())
         }
 
         btn_ok_pw.setOnClickListener(pClickListener)
