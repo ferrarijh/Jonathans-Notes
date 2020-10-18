@@ -32,25 +32,25 @@ class ThumbnailViewHolder(
     fun bind(note: Note, position: Int, clickListener: ThumbnailAdapter.ThumbnailAdapterListener, longClickListener: ThumbnailAdapter.ThumbnailAdapterLongListener){
         val curDate = getDateTime().substring(0, 10)
         val noteDate = note.dateTimeModified.substring(0, 10)
-        if(curDate == noteDate)
-            itemView.tv_thumbnail_date.text = note.dateTimeModified.substring(11)
+        var displayDate = if(curDate == noteDate)
+            note.dateTimeModified.substring(11)
         else
-            itemView.tv_thumbnail_date.text = noteDate
+            noteDate
+        displayDate += " "
 
         val cv = itemView.findViewById<CardView>(R.id.cv_thumbnail)
         cv.setBackgroundColor(Color.parseColor(note.color))
 
-        Log.d("", "position: $position, selected: ${nViewModel.selected[position]}")
         itemView.apply{
+            tv_thumbnail_date.text = displayDate
+
             tv_thumbnail_title.text = note.title
             tv_thumbnail_body.text = note.body
             iv_cover.visibility = View.GONE
             iv_checkbox.visibility = View.GONE
 
-            if(nViewModel.selected[position] != null) {
-                Log.d("","> position $position is not null")
+            if(nViewModel.selected[position] != null)
                 setBackgroundToSel()
-            }
 
             nViewModel.selMode.observe(context as LifecycleOwner){
                 if(it == NoteViewModel.OFF)

@@ -26,15 +26,17 @@ class ThumbnailTrashViewHolder(
 
         val curDate = getDateTime().substring(0, 10)
         val noteDate = note.dateTimeModified.substring(0, 10)
-        if(curDate == noteDate)
-            itemView.tv_thumbnail_trash_date.text = note.dateTimeModified.substring(11)
+        var displayDate = if(curDate == noteDate)
+            note.dateTimeModified.substring(11)
         else
-            itemView.tv_thumbnail_trash_date.text = noteDate
+            noteDate
+        displayDate += " "
 
         val cv = itemView.findViewById<CardView>(R.id.cv_thumbnail_trash)
         cv.setBackgroundColor(Color.parseColor(note.color))
 
         itemView.apply{
+            tv_thumbnail_trash_date.text = displayDate
             tv_thumbnail_trash_title.text = note.title
             tv_thumbnail_trash_body.text = note.body
             setOnClickListener{

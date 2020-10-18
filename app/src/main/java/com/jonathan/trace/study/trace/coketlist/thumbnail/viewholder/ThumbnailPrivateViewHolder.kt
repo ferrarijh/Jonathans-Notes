@@ -27,15 +27,17 @@ class ThumbnailPrivateViewHolder(
 
         val curDate = getDateTime().substring(0, 10)
         val noteDate = note.dateTimeModified.substring(0, 10)
-        if(curDate == noteDate)
-            itemView.tv_thumbnail_private_date.text = note.dateTimeModified.substring(11)
+        var displayDate = if(curDate == noteDate)
+            note.dateTimeModified.substring(11)
         else
-            itemView.tv_thumbnail_private_date.text = noteDate
+            noteDate
+        displayDate += " "
 
         val cv = itemView.findViewById<CardView>(R.id.cv_thumbnail_private)
         cv.setBackgroundColor(Color.parseColor(note.color))
 
         itemView.apply{
+            tv_thumbnail_private_date.text = displayDate
             tv_thumbnail_private_title.text = note.title
             setOnClickListener{
                 nViewModel.setNotePointed(layoutPosition, note)
