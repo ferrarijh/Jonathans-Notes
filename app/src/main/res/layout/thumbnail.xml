@@ -26,6 +26,7 @@
                     android:paddingTop="3dp"
                     android:gravity="end"
                     android:text="2000-00-00"
+                    android:textStyle="italic"
                     android:textSize="12sp"
                     android:textColor="@color/dateText"
                     android:ellipsize="end"/>
