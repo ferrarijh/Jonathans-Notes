@@ -134,7 +134,7 @@ How it's done here:
 ```
 By default window is whole screen for app. (area except notification bar and bottom bar)
 
-
+* ```fillAfter=true``` unnecessary if the animation is 'hiding' type of animation and target view's default visibility is ```visibility="invisible"``` in XML.
 
 # Furthermore..
 * Iterating through Collection without iterators to remove entry will trigger ConcurrentModificationException.

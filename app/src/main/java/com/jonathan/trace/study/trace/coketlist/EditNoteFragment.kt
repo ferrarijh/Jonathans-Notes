@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -243,26 +244,30 @@ class EditNoteFragment: Fragment(){
 
     private fun openPalette(){
         fabColors.startAnimation(expand)
+
         fabCoral.show()
-        fabCoral.startAnimation(up)
         fabLemon.show()
-        fabLemon.startAnimation(up)
         fabMint.show()
-        fabMint.startAnimation(up)
         fabWhite.show()
+
+        fabCoral.startAnimation(up)
+        fabLemon.startAnimation(up)
+        fabMint.startAnimation(up)
         fabWhite.startAnimation(up)
     }
 
     private fun closePalette(){
         fabColors.startAnimation(shrink)
-        fabCoral.startAnimation(down)
+
         fabCoral.hide()
-        fabLemon.startAnimation(down)
         fabLemon.hide()
-        fabMint.startAnimation(down)
         fabMint.hide()
-        fabWhite.startAnimation(down)
         fabWhite.hide()
+
+        fabCoral.startAnimation(down)
+        fabLemon.startAnimation(down)
+        fabMint.startAnimation(down)
+        fabWhite.startAnimation(down)
     }
 
     private fun saveNote(){
@@ -329,7 +334,6 @@ class EditNoteFragment: Fragment(){
         fabLemon.hide()
         fabMint.hide()
         fabWhite.hide()
-
 
         arguments?.let{
             val fromSearch = EditNoteFragmentArgs.fromBundle(it).fromSearch
