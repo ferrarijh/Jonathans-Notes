@@ -1,5 +1,6 @@
 package com.jonathan.trace.study.trace.coketlist
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -66,6 +68,7 @@ class EditNoteFragment: Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        hideKeyboard()
         setNoteContent()
         setBackground()
         setFAB()
@@ -73,6 +76,13 @@ class EditNoteFragment: Fragment(){
         setAppBar()
         setDrawer()
         setOnBackPressed()
+    }
+
+    private fun hideKeyboard() {
+        requireActivity().currentFocus?.let{
+            val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(it.windowToken, 0)
+        }
     }
 
     private fun setBackground(){

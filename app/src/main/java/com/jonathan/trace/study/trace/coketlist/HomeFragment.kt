@@ -6,7 +6,11 @@ import android.os.Bundle
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.*
+import android.view.inputmethod.InputMethod
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -23,13 +27,14 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
 import com.jonathan.trace.study.trace.coketlist.dialog.DeleteMultiDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.PwDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
+import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
 import kotlinx.android.synthetic.main.fragment_home.*
+
 
 class HomeFragment : Fragment() {
 
@@ -45,7 +50,10 @@ class HomeFragment : Fragment() {
     private val parent by lazy{requireActivity() as AppCompatActivity}
 
     private val appear: Animation by lazy{ AnimationUtils.loadAnimation(context, R.anim.btn_appear)}
-    private val disappear: Animation by lazy{ AnimationUtils.loadAnimation(context, R.anim.global_disappear)}
+    private val disappear: Animation by lazy{ AnimationUtils.loadAnimation(
+        context,
+        R.anim.global_disappear
+    )}
 
     private val sharedPreference by lazy {
         parent.getSharedPreferences("Sort", Context.MODE_PRIVATE)
@@ -71,6 +79,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        hideKeyboard()
         setViewModel()
         setNotes()
         setAdapter()
@@ -98,6 +107,13 @@ class HomeFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun hideKeyboard() {
+        requireActivity().currentFocus?.let{
+            val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+    }
+
     private fun setBtn(){
         btnDeleteMulti.setOnClickListener{
             if(nViewModel.selected.isEmpty())
@@ -119,7 +135,7 @@ class HomeFragment : Fragment() {
 
         nViewModel.prevSort.observe(viewLifecycleOwner){
             notes = getNotesBy(it)
-            notes.observe(viewLifecycleOwner){list ->
+            notes.observe(viewLifecycleOwner){ list ->
                 adapter.updateList(list)
             }
             spEditor.putInt("Sort", it)
@@ -177,7 +193,7 @@ class HomeFragment : Fragment() {
         val ivHome = toolBar.findViewById<ImageView>(R.id.iv_hamburger)
         ivHome.let {
             it.setImageResource(R.mipmap.ic_hamburger_foreground)
-            it.setOnClickListener{_ ->
+            it.setOnClickListener{ _ ->
                 val drawer = parent.findViewById<DrawerLayout>(R.id.layout_drawer)
                 drawer.openDrawer(GravityCompat.START)
             }
@@ -201,9 +217,9 @@ class HomeFragment : Fragment() {
             goToEditNoteNew()
         }
 
-        rv_notes.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        rv_notes.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if(nViewModel.getSelMode() == NoteViewModel.OFF) {
+                if (nViewModel.getSelMode() == NoteViewModel.OFF) {
                     if (dy > 0)
                         fabAdd.hide()
                     else
@@ -359,13 +375,19 @@ class HomeFragment : Fragment() {
 
         val ori = requireActivity().resources.configuration.orientation
         if(ori == Configuration.ORIENTATION_LANDSCAPE)
-            rv_notes.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+            rv_notes.layoutManager = StaggeredGridLayoutManager(
+                3,
+                StaggeredGridLayoutManager.VERTICAL
+            )
         else if (ori == Configuration.ORIENTATION_PORTRAIT)
-            rv_notes.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            rv_notes.layoutManager = StaggeredGridLayoutManager(
+                2,
+                StaggeredGridLayoutManager.VERTICAL
+            )
     }
 
     private fun setAnimation(){
-        disappear.setAnimationListener(object: Animation.AnimationListener{
+        disappear.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {
             }
 
