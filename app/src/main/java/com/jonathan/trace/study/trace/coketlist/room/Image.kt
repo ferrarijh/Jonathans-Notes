@@ -10,6 +10,5 @@ import androidx.room.PrimaryKey
 data class Image(
     @PrimaryKey
     var path: String,
-    //@ForeignKey(entity = Note::class, parentColumns = ["id"], childColumns = ["noteId"], onDelete = CASCADE)
     var noteId: Int
 )

@@ -3,6 +3,43 @@
 app architecture guide:
 https://developer.android.com/jetpack/guide?hl=ko
 
+## ROOM DB
+
+### Add table with Foreign key (one-to-many)
+
+New table entity:
+```kotlin
+@Entity(tableName = "image_table", foreignKeys = [ForeignKey(entity=Note::class, parentColumns = ["id"], childColumns = ["noteId"], onDelete = CASCADE)])
+data class Image(
+    @PrimaryKey
+    var path: String,
+    var noteId: Int
+)
+```
+
+Migration:
+```kotlin
+    private val MIGRATION_5_6 = object : Migration(5,6) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS image_table(noteId INTEGER NOT NULL, path VARCHAR NOT NULL, PRIMARY KEY(path), FOREIGN KEY(noteId) REFERENCES note_table(id) ON DELETE CASCADE)"
+            )
+        }
+    }
+```
+
+### Migration
+* For ```IllegalStateException``` from migration, stacktrace will print out two parts like below:
+```
+     Expected:
+    TableInfo{name='image_table', columns={path=Column{name='path', type='TEXT', affinity='2', notNull=true, primaryKeyPosition=1, defaultValue='null'}, noteId=Column{name='noteId', type='INTEGER', affinity='3', notNull=true, primaryKeyPosition=0, defaultValue='null'}}, foreignKeys=[ForeignKey{referenceTable='note_table', onDelete='CASCADE', onUpdate='NO ACTION', columnNames=[noteId], referenceColumnNames=[id]}], indices=[]}
+     Found:
+    TableInfo{name='image_table', columns={path=Column{name='path', type='VARCHAR', affinity='2', notNull=false, primaryKeyPosition=1, defaultValue='null'}, noteId=Column{name='noteId', type='INTEGER', affinity='3', notNull=false, primaryKeyPosition=0, defaultValue='null'}}, foreignKeys=[ForeignKey{referenceTable='note_table', onDelete='NO ACTION', onUpdate='NO ACTION', columnNames=[noteId], referenceColumnNames=[id]}], indices=[]}
+```
+Here,
+```Expected```: defined data class
+```Found```: Migration scheme
+
 ## Repository
 * properties - service instance (ex. dao instance, webservice instance)
 * methods - fetch specific data (ex. fun getUser(): LiveData<User>)
@@ -41,17 +78,6 @@ Good:
 
 * If observer is not set on a LiveData object, the object won't update values. For example, if
 ```LiveData<List<User>>``` is returned by Dao but no observer is set then the value of the LiveData object will always be null.
-
-* For ```IllegalStateException``` from migration, stacktrace will print out two parts like below:
-```
-     Expected:
-    TableInfo{name='image_table', columns={path=Column{name='path', type='TEXT', affinity='2', notNull=true, primaryKeyPosition=1, defaultValue='null'}, noteId=Column{name='noteId', type='INTEGER', affinity='3', notNull=true, primaryKeyPosition=0, defaultValue='null'}}, foreignKeys=[ForeignKey{referenceTable='note_table', onDelete='CASCADE', onUpdate='NO ACTION', columnNames=[noteId], referenceColumnNames=[id]}], indices=[]}
-     Found:
-    TableInfo{name='image_table', columns={path=Column{name='path', type='VARCHAR', affinity='2', notNull=false, primaryKeyPosition=1, defaultValue='null'}, noteId=Column{name='noteId', type='INTEGER', affinity='3', notNull=false, primaryKeyPosition=0, defaultValue='null'}}, foreignKeys=[ForeignKey{referenceTable='note_table', onDelete='NO ACTION', onUpdate='NO ACTION', columnNames=[noteId], referenceColumnNames=[id]}], indices=[]}
-```
-Here,
-```Expected```: defined data class
-```Found```: Migration scheme
 
 # UI components
 
