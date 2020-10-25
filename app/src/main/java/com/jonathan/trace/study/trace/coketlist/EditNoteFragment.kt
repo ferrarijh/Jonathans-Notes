@@ -103,8 +103,6 @@ class EditNoteFragment: Fragment(){
         }
 
         Log.d("", "colorSelected.value: ${colorSelected.value}")
-
-
     }
 
     private fun setDrawer(){

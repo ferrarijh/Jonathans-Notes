@@ -128,7 +128,7 @@ class SearchFragment: Fragment(){
         //options Dialog
         val setPw = getString(R.string.set_pw)
         val trash = getString(R.string.trash)
-        val options = arrayOf(trash, setPw)
+        val options = arrayOf(setPw, trash)
 
         val oBuilder = AlertDialog.Builder(requireContext())
         oBuilder.setItems(options){ _, i ->

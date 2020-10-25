@@ -28,10 +28,6 @@ class ThumbnailAdapter(
         const val TRASH = 3
     }
 
-    init{
-        Log.d("", "ThumbnailAdapter created!")
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(layoutResId, parent, false)
         return when(viewHolderType) {
@@ -62,7 +58,6 @@ class ThumbnailAdapter(
     }
 
     fun updateList(newList: List<Note>) {
-        Log.d("", "newList.size: ${newList.size}")
         val callback = ListDiffCallback(thumbnails, newList)
         var diffResult : DiffUtil.DiffResult? = null
         CoroutineScope(Dispatchers.Default).launch {
@@ -72,7 +67,6 @@ class ThumbnailAdapter(
                 //thumbnails = newList    //this will NOT dynamically update search fragment
                 thumbnails.clear()
                 thumbnails.addAll(newList)
-                Log.d("","in invokeOncompletion, thumbnails.size: ${thumbnails.size}")
                 diffResult?.dispatchUpdatesTo(this@ThumbnailAdapter)
             }
         }

@@ -13,7 +13,7 @@ https://developer.android.com/jetpack/guide?hl=ko
 # LiveData
 
 ### When NOT to use LiveData in ViewModel?
-* when multiple views are not interacting each other there's no need to use LiveData.
+* when multiple views are not interacting each other there's no need to use LiveData. (UNLESS you want to recover view states on rotation)
 
 ### Extra
 * when updating collection of instance in adapter class with another list wrapped with LiveData container,
@@ -41,6 +41,17 @@ Good:
 
 * If observer is not set on a LiveData object, the object won't update values. For example, if
 ```LiveData<List<User>>``` is returned by Dao but no observer is set then the value of the LiveData object will always be null.
+
+* For ```IllegalStateException``` from migration, stacktrace will print out two parts like below:
+```
+     Expected:
+    TableInfo{name='image_table', columns={path=Column{name='path', type='TEXT', affinity='2', notNull=true, primaryKeyPosition=1, defaultValue='null'}, noteId=Column{name='noteId', type='INTEGER', affinity='3', notNull=true, primaryKeyPosition=0, defaultValue='null'}}, foreignKeys=[ForeignKey{referenceTable='note_table', onDelete='CASCADE', onUpdate='NO ACTION', columnNames=[noteId], referenceColumnNames=[id]}], indices=[]}
+     Found:
+    TableInfo{name='image_table', columns={path=Column{name='path', type='VARCHAR', affinity='2', notNull=false, primaryKeyPosition=1, defaultValue='null'}, noteId=Column{name='noteId', type='INTEGER', affinity='3', notNull=false, primaryKeyPosition=0, defaultValue='null'}}, foreignKeys=[ForeignKey{referenceTable='note_table', onDelete='NO ACTION', onUpdate='NO ACTION', columnNames=[noteId], referenceColumnNames=[id]}], indices=[]}
+```
+Here,
+```Expected```: defined data class
+```Found```: Migration scheme
 
 # UI components
 

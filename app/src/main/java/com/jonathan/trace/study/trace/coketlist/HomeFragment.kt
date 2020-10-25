@@ -163,21 +163,21 @@ class HomeFragment : Fragment() {
 
     }
 
-    private fun setNavView(){
-        parent.findViewById<NavigationView>(R.id.nv).setNavigationItemSelectedListener {
-            parent.findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
-            when(it.itemId){
-                R.id.item_private_note -> {
-                    goToPrivate()
-                }
-                R.id.item_trash_can -> {
-                    goToTrashCan()
-                }
-            }
-            requireActivity().findViewById<DrawerLayout>(R.id.layout_drawer).close()
-            true
-        }
-    }
+//    private fun setNavView(){
+//        parent.findViewById<NavigationView>(R.id.nv).setNavigationItemSelectedListener {
+//            parent.findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
+//            when(it.itemId){
+//                R.id.item_private_note -> {
+//                    goToPrivate()
+//                }
+//                R.id.item_trash_can -> {
+//                    goToTrashCan()
+//                }
+//            }
+//            requireActivity().findViewById<DrawerLayout>(R.id.layout_drawer).close()
+//            true
+//        }
+//    }
 
     private fun setOnBackPressed(){
         requireActivity().onBackPressedDispatcher.addCallback(this){
