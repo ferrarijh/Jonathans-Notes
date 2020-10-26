@@ -15,7 +15,7 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
      * **/
     private val repository: NoteRepository
 
-    //TODO("bug - val getAllNotes error")
+    //TODO("val getAllNotes gives error")
     /*
     val getAllNotes: LiveData<List<Note>>
     val getAllTrashNotes: LiveData<List<Note>>
