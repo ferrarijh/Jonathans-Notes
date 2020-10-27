@@ -68,6 +68,9 @@ class TrashCanFragment : Fragment() {
         notes.observe(viewLifecycleOwner){
             adapter.updateList(it)
         }
+        nViewModel.allTrashed.observe(viewLifecycleOwner){
+            //do nothing
+        }
     }
 
     private fun setDrawer(){

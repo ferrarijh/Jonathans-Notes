@@ -34,6 +34,10 @@ import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class HomeFragment : Fragment() {
@@ -86,7 +90,6 @@ class HomeFragment : Fragment() {
         setDialog()
         setFAB()
         setAppBar()
-        //setNavView()
         setDrawer(true)
         setWithMultiSelState()
         setBtn()
@@ -162,22 +165,6 @@ class HomeFragment : Fragment() {
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
 
     }
-
-//    private fun setNavView(){
-//        parent.findViewById<NavigationView>(R.id.nv).setNavigationItemSelectedListener {
-//            parent.findViewById<AppBarLayout>(R.id.appBar).setExpanded(true)
-//            when(it.itemId){
-//                R.id.item_private_note -> {
-//                    goToPrivate()
-//                }
-//                R.id.item_trash_can -> {
-//                    goToTrashCan()
-//                }
-//            }
-//            requireActivity().findViewById<DrawerLayout>(R.id.layout_drawer).close()
-//            true
-//        }
-//    }
 
     private fun setOnBackPressed(){
         requireActivity().onBackPressedDispatcher.addCallback(this){
@@ -356,7 +343,8 @@ class HomeFragment : Fragment() {
 
     private fun setAdapter(){
         adapter = ThumbnailAdapter(
-            notes.value as MutableList<Note>? ?: mutableListOf<Note>(),
+            //notes.value as MutableList<Note>? ?:
+            mutableListOf<Note>(),
             R.layout.thumbnail,
             ThumbnailAdapter.HOME,
             object : ThumbnailAdapter.ThumbnailAdapterListener {

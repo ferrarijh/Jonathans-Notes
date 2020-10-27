@@ -7,13 +7,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.io.File
 
-class NoteViewModel (app: Application): AndroidViewModel(app){
+class NoteViewModel (app: Application): AndroidViewModel(app) {
+    private val filesPath = app.filesDir.absolutePath
+
     /**
      * ROOM components
      * **/
-    private val repository: NoteRepository
+    private val repository: NoteRepository = NoteRepository
 
     //TODO("val getAllNotes gives error")
     /*
@@ -35,9 +39,12 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
 
     fun getIdLastSaved(): LiveData<Int> = repository.getIdLastSaved()
 
-    init{
+    init {
+
         val noteDao = NoteDatabase.getDatabase(app).getNoteDao()
-        repository = NoteRepository(noteDao)
+        val imageDao = NoteDatabase.getDatabase(app).getImageDao()
+        repository.setNoteDao(noteDao)
+        repository.setImageDao(imageDao)
         Log.d("", "NoteViewModel initialized!")
 /*
         //getAllNotes = repository.getAllNotes()
@@ -49,20 +56,34 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
  */
     }
 
-    fun addNote(note: Note){
-        viewModelScope.launch(Dispatchers.IO){
+    fun addNote(note: Note) {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.addNote(note)
         }
     }
 
-    fun delete(note: Note){
+    fun delete(note: Note) {
+        val fullDir = filesPath + "/Pictures/${note.id}"
+        val file = File(fullDir)
+        file.deleteRecursively()
         viewModelScope.launch(Dispatchers.IO) {
             repository.delete(note)
         }
     }
 
+    val allTrashed: LiveData<List<Note>>
+    init{
+        allTrashed = getAllTrashNotes()
+    }
     fun deleteAllTrashed(){
         viewModelScope.launch(Dispatchers.IO){
+            allTrashed.value?.let{
+                it.forEach{
+                    val fullDir = filesPath + "/Pictures/${it.id}"
+                    val file = File(fullDir)
+                    file.deleteRecursively()
+                }
+            }
             repository.deleteAllTrashed()
         }
     }
@@ -155,4 +176,5 @@ class NoteViewModel (app: Application): AndroidViewModel(app){
         setSelMode(OFF)
         return newListLive
     }
+
 }

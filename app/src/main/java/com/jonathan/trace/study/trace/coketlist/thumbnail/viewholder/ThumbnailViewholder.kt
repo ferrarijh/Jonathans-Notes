@@ -35,7 +35,8 @@ class ThumbnailViewHolder(
         var displayDate = if(curDate == noteDate)
             note.dateTimeModified.substring(11)
         else
-            noteDate
+            noteDate.substring(5) + '-' + noteDate.substring(0,4)
+
         displayDate += " "
 
         val cv = itemView.findViewById<CardView>(R.id.cv_thumbnail)

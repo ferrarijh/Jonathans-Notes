@@ -9,6 +9,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "image_table", foreignKeys = [ForeignKey(entity=Note::class, parentColumns = ["id"], childColumns = ["noteId"], onDelete = CASCADE)])
 data class Image(
     @PrimaryKey
-    var path: String,
+    var path: String,   /** file name (NOT path!) **/
     var noteId: Int
 )

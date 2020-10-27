@@ -79,4 +79,6 @@
 
     <string name="note_recovered">복원!</string>
 
+    <string name="fetching_image">사진을 가져오는중이에요..</string>
+
 </resources>

@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/vp_attached_images"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:scrollbars="vertical" />
+    <TextView
+        android:id="@+id/tv_page_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/icons"
+        android:textSize="10sp"
+        android:layout_gravity="center"/>
     <ImageButton
         android:id="@+id/ib_attach_image"
         android:layout_width="wrap_content"
@@ -18,20 +34,23 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:layout_marginEnd="20dp"
-        android:layout_gravity="end"/>
+        android:layout_gravity="end"
+        android:clickable="true"
+        android:focusable="true"/>
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_edit_note"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         app:cardCornerRadius="5dp"
         app:cardElevation="3dp">
 
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+<!--        <androidx.core.widget.NestedScrollView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:fillViewport="true">-->
             <LinearLayout
                 android:id="@+id/layout_edit_note"
                 android:orientation="vertical"
@@ -68,7 +87,12 @@
                     android:background="@android:color/transparent"
                     android:scrollbars="vertical" />
             </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
-
+<!--        </androidx.core.widget.NestedScrollView>-->
+<!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--            android:id="@+id/fab_test"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="bottom|start"/>-->
     </androidx.cardview.widget.CardView>
 </LinearLayout>
+</androidx.core.widget.NestedScrollView>
