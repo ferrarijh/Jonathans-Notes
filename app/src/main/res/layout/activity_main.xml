@@ -123,7 +123,7 @@
                 android:id="@+id/fab_colors"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/gradient_circle"
+                android:src="@drawable/gradient_circle_small"
                 app:fabSize="mini"
                 android:backgroundTint="#FFFFFF"
                 app:maxImageSize="32dp"
