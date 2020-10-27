@@ -25,8 +25,8 @@ class ViewPagerAdapter(
     private val longClickListener: View.OnLongClickListener
     ): ListAdapter<Image, ViewPagerAdapter.PageViewHolder>(
     object: DiffUtil.ItemCallback<Image>(){
-        override fun areItemsTheSame(oldItem: Image, newItem: Image): Boolean = oldItem.path == newItem.path
-        override fun areContentsTheSame(oldItem: Image, newItem: Image): Boolean = oldItem.path == newItem.path
+        override fun areItemsTheSame(oldItem: Image, newItem: Image): Boolean = oldItem.name == newItem.name
+        override fun areContentsTheSame(oldItem: Image, newItem: Image): Boolean = oldItem.name == newItem.name
     }){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageViewHolder =
@@ -42,7 +42,7 @@ class ViewPagerAdapter(
     class PageViewHolder(itemView: View, fragment: Fragment, private val longClickListener: View.OnLongClickListener): RecyclerView.ViewHolder(itemView){
         private val fViewModel by lazy{ ViewModelProvider(fragment).get(FragmentStateViewModel::class.java) }
         fun bind(image: Image, imageViewer: ImageViewFragment){
-            val fileName = image.path
+            val fileName = image.name
             val filesDir = itemView.context.filesDir
 
             val fullDir = "${filesDir.absolutePath}/Pictures/${image.noteId}/$fileName"

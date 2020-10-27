@@ -25,7 +25,10 @@ abstract class NoteDatabase: RoomDatabase(){
         private val MIGRATION_5_6 = object : Migration(5,6) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
-                    "CREATE TABLE IF NOT EXISTS image_table(noteId INTEGER NOT NULL, path VARCHAR NOT NULL, PRIMARY KEY(path), FOREIGN KEY(noteId) REFERENCES note_table(id) ON DELETE CASCADE)"
+                    "CREATE TABLE IF NOT EXISTS image_table(noteId INTEGER NOT NULL, name VARCHAR NOT NULL, PRIMARY KEY(name), FOREIGN KEY(noteId) REFERENCES note_table(id) ON DELETE CASCADE)"
+                )
+                database.execSQL(
+                    "CREATE INDEX index_image_table_noteId ON image_table(noteId)"
                 )
             }
         }

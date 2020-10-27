@@ -632,20 +632,20 @@ class EditNoteFragment: Fragment(){
             fViewModel.deleteImage(imagePointed)
         }
         val fullDir = requireActivity().filesDir.absolutePath + "/Pictures/${imagePointed.noteId}"
-        val file = File(fullDir, imagePointed.path)
+        val file = File(fullDir, imagePointed.name)
 
         if(file.exists()){
             if(file.delete())
-                Log.d("", "file deleted: ${imagePointed.path}")
+                Log.d("", "file deleted: ${imagePointed.name}")
             else
-                Log.d("", "deletion failed: ${imagePointed.path}")
+                Log.d("", "deletion failed: ${imagePointed.name}")
         }
     }
 
     private fun deleteNewImages(){
         val fullPath = requireActivity().filesDir.absolutePath+"/Pictures/0"
         fViewModel.imagesForNewNote.value!!.forEach{
-            val fileName = it.path
+            val fileName = it.name
             val file = File(fullPath, fileName)
             if(file.exists()){
                 if(file.delete())

@@ -190,6 +190,3 @@ Good:
         iter.remove()
     }
 ```
-
-# Unsolved
-* LiveData retrieved by ROOM db seems to update automatically after change in dataset?
