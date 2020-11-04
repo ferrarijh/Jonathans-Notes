@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="pageHeight">200dp</dimen>
     <dimen name="pageMargin">40dp</dimen>
     <dimen name="peekOffset">25dp</dimen>
 </resources>

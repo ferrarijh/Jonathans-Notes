@@ -190,3 +190,7 @@ Good:
         iter.remove()
     }
 ```
+
+* ViewPager2 glitch with ListAdapter - Calling ```.submitList(newList)``` after data deletion does not properly set
+```viewPager2.currentItem```. Thus if page transformer is attached page positions displayed are spoiled after the deletion.
+Solved by using simple ```RecyclerView.Adapter```.

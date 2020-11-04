@@ -26,12 +26,14 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jonathan.trace.study.trace.coketlist.adapter.ViewPagerAdapter
+import com.jonathan.trace.study.trace.coketlist.adapter.ViewPagerAdapterTest
 import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.fragment.ImageViewFragment
 import com.jonathan.trace.study.trace.coketlist.room.Image
@@ -61,7 +63,8 @@ class EditNoteFragment: Fragment(){
     private val fViewModel by lazy{ViewModelProvider(this).get(FragmentStateViewModel::class.java)}
     private val isPaletteOpen = MutableLiveData<Boolean>()
     private var justInitialized = true
-    private val vAdapter by lazy {ViewPagerAdapter(imageViewer, this){deleteImageDialog.show(); true} }
+//    private val vAdapter by lazy {ViewPagerAdapter(imageViewer, this){deleteImageDialog.show(); true} }
+    private val tAdapter by lazy{ ViewPagerAdapterTest(fViewModel.images?.value, imageViewer, this){deleteImageDialog.show(); true} }
     private val imageViewer: ImageViewFragment by lazy{ImageViewFragment()}
     private lateinit var deleteImageDialog : MyDialog
 
@@ -130,7 +133,9 @@ class EditNoteFragment: Fragment(){
         if(resultCode == RESULT_OK && requestCode == IMAGE_PICK_CODE){
             Toast.makeText(context, getString(R.string.fetching_image), Toast.LENGTH_SHORT).show()
             data?.data.run{
-                processImageUri(this)
+                val noteId = nViewModel.getNotePointed()!!.second.id
+                val isNewAndNotSaved = noteId == 0
+                fViewModel.processImageUri(this, requireActivity(), noteId, isNewAndNotSaved)
             }
         }
 
@@ -139,14 +144,14 @@ class EditNoteFragment: Fragment(){
 
     private fun setViewPager(){
         vp_attached_images.apply{
-            adapter = vAdapter
+//            adapter = vAdapter
+            adapter = tAdapter
             offscreenPageLimit = 2
 
             val screenWidth = resources.displayMetrics.widthPixels
             val marginPx = resources.getDimensionPixelOffset(R.dimen.pageMargin)
             val offsetPx = resources.getDimensionPixelOffset(R.dimen.peekOffset)
             setPageTransformer{ page, position ->
-//            TODO("translate X dynamically corresponding to iv_item.width")
                 val ivWidth = page.iv_item.width
                 val add =  screenWidth/2 - marginPx - ivWidth/2
                 val scaleFactor = 1-0.2f*(abs(position))
@@ -159,7 +164,8 @@ class EditNoteFragment: Fragment(){
 
             registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
                 override fun onPageSelected(position: Int) {
-                    setPageIndicator(vAdapter.itemCount)
+//                    fViewModel.setPageIndicator(vAdapter.itemCount, vp_attached_images.currentItem)
+                    fViewModel.setPageIndicator(tAdapter.itemCount, vp_attached_images.currentItem)
                 }
             })
         }
@@ -167,76 +173,6 @@ class EditNoteFragment: Fragment(){
         fViewModel.pageIndicator.observe(viewLifecycleOwner){
             tv_page_count.text = it
         }
-    }
-
-    //TODO("move to ViewModel")
-    private fun processImageUri(uri: Uri?){
-        CoroutineScope(Dispatchers.Default).launch {
-            if (uri == null) {
-                toastNullUri()
-                this.cancel()
-            }
-
-            val scaledBitmap = parseScaledBitmap(uri!!)
-            val fileName = saveToStorage(scaledBitmap)
-
-            val isNewAndNotSaved = nViewModel.getNotePointed()!!.second.id == 0
-
-            if (!isNewAndNotSaved) {
-                val noteId = nViewModel.getNotePointed()!!.second.id
-                val imgProfile = Image(fileName, noteId)
-                fViewModel.addImages(listOf(imgProfile))
-            } else {
-                fViewModel.imagesForNewNote.value!!.add(Image(fileName, 0))
-                withContext(Dispatchers.Main) {
-                    fViewModel.imagesForNewNote.value = fViewModel.imagesForNewNote.value!!
-                }
-            }
-        }
-    }
-
-    //TODO("move to ViewModel")
-    private fun saveToStorage(bitmap: Bitmap): String{
-        val filesDir = requireActivity().filesDir
-        val noteId = nViewModel.getNotePointed()!!.second.id
-        val dir = File(filesDir.absolutePath + "/Pictures/$noteId")
-        dir.mkdirs()
-
-        val fileName = String.format("%d.jpeg", System.currentTimeMillis())
-        val outputFile = File(dir, fileName)
-        var oStream: FileOutputStream? = null
-        try{
-            oStream = FileOutputStream(outputFile)
-        }catch (e: Exception){
-            e.printStackTrace()
-        }
-
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, oStream)
-
-        return fileName
-    }
-
-    //TODO("move to ViewModel")
-    private fun parseScaledBitmap(uri: Uri): Bitmap{
-
-        val contentResolver = requireActivity().contentResolver
-        var bitmap = with(ImageDecoder.createSource(contentResolver, uri)) {
-            ImageDecoder.decodeBitmap(this)
-        }
-
-        val w = bitmap.width
-        val h = bitmap.height
-        val max = if(w>h) w else h
-        val scaleFactor = if(max > 1000){
-            1000 / max.toFloat()
-        }else 1f
-
-        if (scaleFactor != 1f)
-            bitmap = Bitmap.createScaledBitmap(
-                bitmap, (w * scaleFactor).toInt(), (h * scaleFactor).toInt(), false
-            )
-
-        return bitmap
     }
 
     private fun setViewModel(){
@@ -247,25 +183,16 @@ class EditNoteFragment: Fragment(){
             CoroutineScope(Dispatchers.Main).launch {
                 fViewModel.setImages(noteId)
                 fViewModel.images!!.observe(viewLifecycleOwner) {
-                    vAdapter.submitList(it)
-                    setPageIndicator(it.size)
+//                    vAdapter.submitList(it)
+                    tAdapter.images = it
+                    tAdapter.notifyDataSetChanged()
+                    fViewModel.setPageIndicator(it.size, vp_attached_images.currentItem)
                 }
             }
         }else{
-            vAdapter.submitList(fViewModel.imagesForNewNote.value)
-        }
-    }
-
-    private fun setPageIndicator(size: Int){
-        if(size == 0)
-            fViewModel.pageIndicator.value = ""
-        else {
-            var indicator = ""
-            val pos = vp_attached_images.currentItem
-            for(i in 0 until size){
-                indicator += if(i == pos) "●" else "○"
-            }
-            fViewModel.pageIndicator.value = indicator
+//            vAdapter.submitList(fViewModel.imagesForNewNote.value)
+            tAdapter.images = fViewModel.imagesForNewNote.value
+            tAdapter.notifyDataSetChanged()
         }
     }
 
@@ -422,26 +349,29 @@ class EditNoteFragment: Fragment(){
             val noteId = nViewModel.getNotePointed()!!.second.id
             fViewModel.setImages(noteId)
             fViewModel.images!!.observe(viewLifecycleOwner){
-                submitToAdapter(it as MutableList<Image>)
+//                submitToAdapter(it as MutableList<Image>)
+                tAdapter.images = it
+                tAdapter.notifyDataSetChanged()
             }
         }else{
             fViewModel.imagesForNewNote.observe(viewLifecycleOwner){
-                submitToAdapter(it)
-                setPageIndicator(it.size)
+//                submitToAdapter(it)
+                tAdapter.images = it
+                tAdapter.notifyDataSetChanged()
+                fViewModel.setPageIndicator(it.size, vp_attached_images.currentItem)
             }
         }
     }
 
-    private fun submitToAdapter(images: MutableList<Image>){
-        val newList = mutableListOf<Image>()
-        images.forEach{
-            newList.add(it)
-        }
-        vAdapter.submitList(newList)
-    }
+//    private fun submitToAdapter(images: MutableList<Image>){
+//        val newList = mutableListOf<Image>()
+//        images.forEach{
+//            newList.add(it)
+//        }
+//        vAdapter.submitList(newList)
+//    }
 
     private fun setFAB(){
-        //palette
         fViewModel.isPaletteOpen.value?.let{
             isPaletteOpen.value = it
         }
@@ -540,6 +470,7 @@ class EditNoteFragment: Fragment(){
         fabWhite.startAnimation(down)
     }
 
+    //TODO("move to ViewModel")
     private fun saveNote(action: Int?, isOnClick: Boolean){
         val title = et_title.text.toString().trim()
         val body = et_body.text.toString().trim()
@@ -555,11 +486,13 @@ class EditNoteFragment: Fragment(){
                 nViewModel.addNote(curNote)
                 withContext(Dispatchers.Main){
                     val curIdLive = nViewModel.getIdLastSaved()
-                    curIdLive.observe(viewLifecycleOwner){
-                        curNote.id = it
-                        saveNewImagesToDb(it)
-                        if(action == GO_BACK)
-                            goBack()
+                    curIdLive.observe(viewLifecycleOwner){id: Int? ->
+                        id?.let {
+                            curNote.id = id
+                            saveNewImagesToDb(id)
+                            if (action == GO_BACK)
+                                goBack()
+                        }
                     }
                 }
             }
@@ -587,28 +520,12 @@ class EditNoteFragment: Fragment(){
 
     /** call ONLY when saving unsaved new note**/
     private fun saveNewImagesToDb(noteId: Int){
-        val newImages = fViewModel.imagesForNewNote.value!!
-        if(newImages.isNotEmpty()){
-            newImages.forEach{
-                it.noteId = noteId
-            }
-
-            CoroutineScope(Dispatchers.IO).launch {
-                fViewModel.addImages(newImages)
-            }
-            val path = requireActivity().filesDir.absolutePath+"/Pictures"
-            val oldDir = File(path, "0")
-            val newDir = File(path, noteId.toString())
-            if(oldDir.renameTo(newDir))
-                Log.d("", "SUCCESS: change dir from 0 to $noteId")
-            else
-                throw Exception("FAILED: change dir name from 0 to $noteId")
-
-            CoroutineScope(Dispatchers.Main).launch {
-                fViewModel.setImages(noteId)
-                fViewModel.images!!.observe(viewLifecycleOwner){
-                    submitToAdapter(it as MutableList<Image>)
-                }
+        CoroutineScope(Dispatchers.Main).launch{
+            val images: LiveData<List<Image>> = fViewModel.saveNewImagesToDb(noteId, requireActivity())
+            images.observe(viewLifecycleOwner){
+//                submitToAdapter(it as MutableList<Image>)
+                tAdapter.images = it
+                tAdapter.notifyDataSetChanged()
             }
             fViewModel.imagesForNewNote.removeObservers(viewLifecycleOwner)
         }
@@ -621,55 +538,15 @@ class EditNoteFragment: Fragment(){
     }
 
     private fun setDialog(){
-        warnDialog = MyDialog(
-            requireContext(),
-            R.layout.dialog,
-            getString(R.string.warn_cancel_edit)
+        warnDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.warn_cancel_edit)
         ){
             goBack()
             warnDialog.dismiss()
         }
 
         deleteImageDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.delete_image)){
-            deleteImageCallback()
+            fViewModel.deleteImageCallback(requireActivity(), vp_attached_images.currentItem)
             deleteImageDialog.dismiss()
-        }
-    }
-
-    private fun deleteImageCallback(){
-        val imagePointed = fViewModel.imagePointed!!
-        val isNewAndNotSaved = imagePointed.noteId == 0
-
-        if(isNewAndNotSaved){
-            val newImagesLive = fViewModel.imagesForNewNote
-            newImagesLive.value!!.remove(imagePointed)
-            newImagesLive.value = newImagesLive.value!!
-            setPageIndicator(newImagesLive.value!!.size)
-        }else {
-            fViewModel.deleteImage(imagePointed)
-        }
-        val fullDir = requireActivity().filesDir.absolutePath + "/Pictures/${imagePointed.noteId}"
-        val file = File(fullDir, imagePointed.name)
-
-        if(file.exists()){
-            if(file.delete())
-                Log.d("", "file deleted: ${imagePointed.name}")
-            else
-                Log.d("", "deletion failed: ${imagePointed.name}")
-        }
-    }
-
-    private fun deleteNewImages(){
-        val fullPath = requireActivity().filesDir.absolutePath+"/Pictures/0"
-        fViewModel.imagesForNewNote.value!!.forEach{
-            val fileName = it.name
-            val file = File(fullPath, fileName)
-            if(file.exists()){
-                if(file.delete())
-                    Log.d("", "file deleted: $fileName")
-                else
-                    Log.d("", "deletion failed: $fileName")
-            }
         }
     }
 
@@ -681,7 +558,7 @@ class EditNoteFragment: Fragment(){
 
     private fun goBack(){
         if(nViewModel.getNotePointed()!!.second.id == 0)
-            deleteNewImages()
+            fViewModel.deleteNewImages(requireActivity())
 
         fabSave.hide()
         fabColors.hide()
@@ -696,12 +573,6 @@ class EditNoteFragment: Fragment(){
                 findNavController().popBackStack(R.id.homeFragment, false)
         }
         findNavController().navigateUp()
-    }
-
-    private suspend fun toastNullUri(){
-        withContext(Dispatchers.Main) {
-            Toast.makeText(context, "Something went wrong - null uri :(", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun colorResToStr(colorRes: Int): String{

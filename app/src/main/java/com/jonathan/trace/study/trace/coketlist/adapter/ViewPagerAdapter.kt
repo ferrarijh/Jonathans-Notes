@@ -20,7 +20,9 @@ import com.jonathan.trace.study.trace.coketlist.room.Image
 import com.jonathan.trace.study.trace.coketlist.viewmodel.FragmentStateViewModel
 import kotlinx.android.synthetic.main.item_viewpager.view.*
 import java.io.File
+import java.lang.Integer.max
 
+//TODO("check if Glide works with ListAdapter")
 class ViewPagerAdapter(
     private val imageViewer: ImageViewFragment,
     private val fragment: Fragment,
@@ -49,14 +51,23 @@ class ViewPagerAdapter(
 
             val fullDir = "${filesDir.absolutePath}/Pictures/${image.noteId}/$fileName"
             val file = File(fullDir)
-            Log.d("", "file path: ${file.absolutePath}")
+//            Log.d("", "file path: ${file.absolutePath}")
             val uri = Uri.fromFile(file)
+
             itemView.iv_item.setImageURI(uri)
 
-//            val marginPx = itemView.context.resources.getDimensionPixelOffset(R.dimen.pageMargin)
-//            val widthPx = itemView.context.resources.displayMetrics.widthPixels
-//            Glide.with(itemView.context).load(uri).override(widthPx - 2*marginPx, 200).into(itemView.iv_item)
-//            Log.d("", "widthPx: $widthPx, marginPx: $marginPx")
+            val marginPx = itemView.context.resources.getDimensionPixelOffset(R.dimen.pageMargin)
+            val widthPx = itemView.context.resources.displayMetrics.widthPixels
+            val heightPx = itemView.context.resources.displayMetrics.heightPixels
+
+            val height = heightPx/4 //itemView.context.resources.getDimensionPixelOffset(R.dimen.pageHeight)
+            val orgWidth = itemView.iv_item.layoutParams.width
+            val maxWidth = widthPx - 2*marginPx
+
+            itemView.iv_item.layoutParams.height = height
+            itemView.iv_item.layoutParams.width = if (orgWidth>maxWidth) maxWidth else orgWidth
+
+//            Glide.with(itemView.context).load(uri).fitCenter().into(itemView.iv_item)
 
             itemView.setOnClickListener{
                 val parent = itemView.context as AppCompatActivity
