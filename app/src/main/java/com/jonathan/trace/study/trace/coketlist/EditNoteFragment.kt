@@ -26,7 +26,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -40,11 +39,13 @@ import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.viewmodel.FragmentStateViewModel
 import kotlinx.android.synthetic.main.fragment_edit_note.*
+import kotlinx.android.synthetic.main.item_viewpager.view.*
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 
 class EditNoteFragment: Fragment(){
 
@@ -60,8 +61,7 @@ class EditNoteFragment: Fragment(){
     private val fViewModel by lazy{ViewModelProvider(this).get(FragmentStateViewModel::class.java)}
     private val isPaletteOpen = MutableLiveData<Boolean>()
     private var justInitialized = true
-    private val adapter by lazy {ViewPagerAdapter(imageViewer, this){deleteImageDialog.show()
-        true} }
+    private val vAdapter by lazy {ViewPagerAdapter(imageViewer, this){deleteImageDialog.show(); true} }
     private val imageViewer: ImageViewFragment by lazy{ImageViewFragment()}
     private lateinit var deleteImageDialog : MyDialog
 
@@ -69,6 +69,7 @@ class EditNoteFragment: Fragment(){
 
     /** color palette **/
     private val fabSave: FloatingActionButton by lazy{ requireActivity().findViewById(R.id.fab_save) }
+
     private val fabColors: FloatingActionButton by lazy{ requireActivity().findViewById(R.id.fab_colors)}
     private val fabCoral: FloatingActionButton by lazy{ requireActivity().findViewById(R.id.fab_coral)}
     private val fabLemon: FloatingActionButton by lazy{ requireActivity().findViewById(R.id.fab_lemon)}
@@ -137,26 +138,38 @@ class EditNoteFragment: Fragment(){
     }
 
     private fun setViewPager(){
-        vp_attached_images.adapter = adapter
+        vp_attached_images.apply{
+            adapter = vAdapter
+            offscreenPageLimit = 2
 
-        val marginPx = resources.getDimensionPixelOffset(R.dimen.pageMargin)
-        val offsetPx = resources.getDimensionPixelOffset(R.dimen.peekOffset)
-        vp_attached_images.setPageTransformer{ page, position ->
-            page.translationX = position * -(offsetPx + marginPx)
+            val screenWidth = resources.displayMetrics.widthPixels
+            val marginPx = resources.getDimensionPixelOffset(R.dimen.pageMargin)
+            val offsetPx = resources.getDimensionPixelOffset(R.dimen.peekOffset)
+            setPageTransformer{ page, position ->
+//            TODO("translate X dynamically corresponding to iv_item.width")
+                val ivWidth = page.iv_item.width
+                val add =  screenWidth/2 - marginPx - ivWidth/2
+                val scaleFactor = 1-0.2f*(abs(position))
+                val gapAfterScale = (1-scaleFactor) * ivWidth /2
+
+                page.translationX = position * -(gapAfterScale + add + marginPx + offsetPx)
+                page.scaleX = scaleFactor
+                page.scaleY = scaleFactor
+            }
+
+            registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
+                override fun onPageSelected(position: Int) {
+                    setPageIndicator(vAdapter.itemCount)
+                }
+            })
         }
 
         fViewModel.pageIndicator.observe(viewLifecycleOwner){
             tv_page_count.text = it
         }
-        vp_attached_images.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
-            override fun onPageSelected(position: Int) {
-                setPageIndicator(adapter.itemCount)
-                super.onPageSelected(position)
-            }
-        })
     }
 
-    //TODO("save new image to db & adapter.submit(newList)")
+    //TODO("move to ViewModel")
     private fun processImageUri(uri: Uri?){
         CoroutineScope(Dispatchers.Default).launch {
             if (uri == null) {
@@ -182,6 +195,7 @@ class EditNoteFragment: Fragment(){
         }
     }
 
+    //TODO("move to ViewModel")
     private fun saveToStorage(bitmap: Bitmap): String{
         val filesDir = requireActivity().filesDir
         val noteId = nViewModel.getNotePointed()!!.second.id
@@ -202,6 +216,7 @@ class EditNoteFragment: Fragment(){
         return fileName
     }
 
+    //TODO("move to ViewModel")
     private fun parseScaledBitmap(uri: Uri): Bitmap{
 
         val contentResolver = requireActivity().contentResolver
@@ -232,12 +247,12 @@ class EditNoteFragment: Fragment(){
             CoroutineScope(Dispatchers.Main).launch {
                 fViewModel.setImages(noteId)
                 fViewModel.images!!.observe(viewLifecycleOwner) {
-                    adapter.submitList(it)
+                    vAdapter.submitList(it)
                     setPageIndicator(it.size)
                 }
             }
         }else{
-            adapter.submitList(fViewModel.imagesForNewNote.value)
+            vAdapter.submitList(fViewModel.imagesForNewNote.value)
         }
     }
 
@@ -331,7 +346,7 @@ class EditNoteFragment: Fragment(){
             }
             setOnLongClickListener{
                 if(isEdited() && !isEmpty())
-                    saveNote(GO_BACK)
+                    saveNote(GO_BACK, false)
                 else {
                     if (isEmpty())
                         Toast.makeText(
@@ -389,7 +404,7 @@ class EditNoteFragment: Fragment(){
             nViewModel.setNotePointed(
                 -1,
                 Note(
-                    0, //id == 0 if new note && not saved  //TODO("change to nullable on migration")
+                    0, //id == 0 if new note && not saved  //TODO("consider changing to nullable on migration")
                     "",
                     "",
                     "",
@@ -406,7 +421,7 @@ class EditNoteFragment: Fragment(){
         if(!isNewAndNotSaved){
             val noteId = nViewModel.getNotePointed()!!.second.id
             fViewModel.setImages(noteId)
-            fViewModel.images!!.observe(viewLifecycleOwner){    //TODO("NPE - possibly?")
+            fViewModel.images!!.observe(viewLifecycleOwner){
                 submitToAdapter(it as MutableList<Image>)
             }
         }else{
@@ -422,7 +437,7 @@ class EditNoteFragment: Fragment(){
         images.forEach{
             newList.add(it)
         }
-        adapter.submitList(newList)
+        vAdapter.submitList(newList)
     }
 
     private fun setFAB(){
@@ -444,13 +459,13 @@ class EditNoteFragment: Fragment(){
         fabSave.apply {
             setOnClickListener {
                 if(isEdited())
-                    saveNote(null)
+                    saveNote(null, true)
                 else
                     Toast.makeText(context, getString(R.string.not_edited), Toast.LENGTH_SHORT).show()
             }
             setOnLongClickListener{
                 if(isEdited() && !isEmpty())
-                    saveNote(GO_BACK)
+                    saveNote(GO_BACK, false)
                 else {
                     if (isEmpty()) {
                         Toast.makeText(
@@ -525,7 +540,7 @@ class EditNoteFragment: Fragment(){
         fabWhite.startAnimation(down)
     }
 
-    private fun saveNote(action: Int?){
+    private fun saveNote(action: Int?, isOnClick: Boolean){
         val title = et_title.text.toString().trim()
         val body = et_body.text.toString().trim()
         val dateTime = getDateTime()
@@ -536,13 +551,11 @@ class EditNoteFragment: Fragment(){
             val curNote = Note(0, title, body, dateTime, dateTime, 0, colorSelected.value!!)
 
             //fetch id immediately after saving new unsaved note
-            var curIdLive: LiveData<Int>
-            CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(Dispatchers.IO).launch{
                 nViewModel.addNote(curNote)
-            }.invokeOnCompletion {
-                curIdLive = nViewModel.getIdLastSaved()
-                CoroutineScope(Dispatchers.Main).launch {
-                    curIdLive.observe(viewLifecycleOwner) {//TODO("does NOT run when new note is LongClick saved")
+                withContext(Dispatchers.Main){
+                    val curIdLive = nViewModel.getIdLastSaved()
+                    curIdLive.observe(viewLifecycleOwner){
                         curNote.id = it
                         saveNewImagesToDb(it)
                         if(action == GO_BACK)
@@ -550,9 +563,11 @@ class EditNoteFragment: Fragment(){
                     }
                 }
             }
+
             nViewModel.setNotePointed(-1, curNote)  //pos == -1 ONLY when saving new note
 
-            Toast.makeText(context, getString(R.string.saved), Toast.LENGTH_SHORT).show()
+            val toastMessage = if(isOnClick) getString(R.string.saved_onclick) else getString(R.string.saved)
+            Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
         }else{
             val curNote = nViewModel.getNotePointed()!!.second
             curNote.title = title
@@ -562,7 +577,9 @@ class EditNoteFragment: Fragment(){
             CoroutineScope(Dispatchers.IO).launch {
                 nViewModel.update(curNote)
             }
-            Toast.makeText(context, getString(R.string.saved), Toast.LENGTH_SHORT).show()
+            val toastMessage = if(isOnClick) getString(R.string.saved_onclick) else getString(R.string.saved)
+            Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+
             if(action == GO_BACK)
                 goBack()
         }
@@ -613,7 +630,7 @@ class EditNoteFragment: Fragment(){
             warnDialog.dismiss()
         }
 
-        deleteImageDialog = MyDialog(requireContext(), R.layout.dialog, "delete?"){
+        deleteImageDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.delete_image)){
             deleteImageCallback()
             deleteImageDialog.dismiss()
         }
@@ -682,9 +699,8 @@ class EditNoteFragment: Fragment(){
     }
 
     private suspend fun toastNullUri(){
-        withContext(Dispatchers.IO) {
-            Toast.makeText(context, "Something went wrong - null uri :(", Toast.LENGTH_SHORT)
-                .show()
+        withContext(Dispatchers.Main) {
+            Toast.makeText(context, "Something went wrong - null uri :(", Toast.LENGTH_SHORT).show()
         }
     }
 

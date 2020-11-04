@@ -1,5 +1,7 @@
 package com.jonathan.trace.study.trace.coketlist.viewmodel
 
+import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
@@ -45,6 +47,10 @@ class FragmentStateViewModel: ViewModel(){
 
     var imagePointed: Image? = null
     val pageIndicator = MutableLiveData("")
+
+    /**for EditNoteFragment - image data processing**/
+    private fun processImageUri(uri: Uri?, parent: Activity, isNewAndNotSaved: Boolean){
+    }
 
     /**for SearchFragment**/
     val curNotes = MutableLiveData<MutableList<Note>>()

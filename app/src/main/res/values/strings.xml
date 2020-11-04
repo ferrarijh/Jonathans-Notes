@@ -54,9 +54,12 @@
 
     <string name="remove_lock">잠금 없애기</string>
 
+    <string name="delete_image">사진을 지울까요?</string>
+
     <!-- Toast -->
     <string name="long_click">길게 눌러 저장하고 나가기</string>
     <string name="saved">저장!</string>
+    <string name="saved_onclick">저장! (길게 눌러 저장하고 나가기)</string>
     <string name="moved_to_trash">노트를 휴지통에 넣었어요</string>
     <string name="trashed">노트를 휴지통에 넣었어요</string>
     <string name="cant_save_empty">빈 노트는 저장되지 않아요</string>

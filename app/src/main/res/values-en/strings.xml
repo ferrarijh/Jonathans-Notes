@@ -52,4 +52,6 @@
     <string name="nothing_to_delete">Nothing selected to delete</string>
     <string name="note_recovered">Recovered!</string>
     <string name="fetching_image">Fetching image..</string>
+    <string name="delete_image">Delete image?</string>
+    <string name="saved_onclick">Saved! (long press to save and exit)</string>
 </resources>

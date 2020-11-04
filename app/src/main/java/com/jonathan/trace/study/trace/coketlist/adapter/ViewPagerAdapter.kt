@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.dialog.fragment.ImageViewFragment
 import com.jonathan.trace.study.trace.coketlist.room.Image
@@ -50,6 +52,11 @@ class ViewPagerAdapter(
             Log.d("", "file path: ${file.absolutePath}")
             val uri = Uri.fromFile(file)
             itemView.iv_item.setImageURI(uri)
+
+//            val marginPx = itemView.context.resources.getDimensionPixelOffset(R.dimen.pageMargin)
+//            val widthPx = itemView.context.resources.displayMetrics.widthPixels
+//            Glide.with(itemView.context).load(uri).override(widthPx - 2*marginPx, 200).into(itemView.iv_item)
+//            Log.d("", "widthPx: $widthPx, marginPx: $marginPx")
 
             itemView.setOnClickListener{
                 val parent = itemView.context as AppCompatActivity

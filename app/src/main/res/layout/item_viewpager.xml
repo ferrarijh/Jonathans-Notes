@@ -2,20 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center">
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/pageMargin"
-        android:layout_marginEnd="@dimen/pageMargin"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:elevation="10dp">
+        android:layout_marginStart="@dimen/pageMargin"
+        android:layout_marginEnd="@dimen/pageMargin"
+        app:cardElevation="5dp">
     <ImageView
         android:id="@+id/iv_item"
         android:layout_width="wrap_content"
         android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_hamburger_foreground"/>
+        android:scaleType="centerCrop"/>
     </androidx.cardview.widget.CardView>
 </LinearLayout>

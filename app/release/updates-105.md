@@ -1,0 +1,1 @@
+* Fix hardcoded string
