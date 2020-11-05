@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.item_viewpager.view.*
 import java.io.File
 import java.lang.Integer.max
 
-//TODO("check if Glide works with ListAdapter")
+//TODO("check if ListAdapter works well with Glide")
 class ViewPagerAdapter(
     private val imageViewer: ImageViewFragment,
     private val fragment: Fragment,

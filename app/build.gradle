@@ -36,9 +36,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-
 }
-
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
