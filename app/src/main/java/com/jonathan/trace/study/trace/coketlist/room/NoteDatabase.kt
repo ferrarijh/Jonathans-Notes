@@ -38,7 +38,7 @@ abstract class NoteDatabase: RoomDatabase(){
             if(tempInstance != null)
                 return tempInstance
 
-            synchronized(this){
+            synchronized(this){ //double-checked locking for singleton
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     NoteDatabase::class.java,

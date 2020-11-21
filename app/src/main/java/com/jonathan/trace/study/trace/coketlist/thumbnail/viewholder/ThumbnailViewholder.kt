@@ -1,9 +1,7 @@
 package com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder
 
 import android.graphics.Color
-import android.util.Log
 import android.view.View
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
@@ -12,7 +10,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.room.Note
-import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
+import com.jonathan.trace.study.trace.coketlist.viewmodel.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
 import kotlinx.android.synthetic.main.thumbnail.view.*
 import java.text.SimpleDateFormat

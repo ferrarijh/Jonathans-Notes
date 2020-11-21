@@ -127,7 +127,6 @@ How it's done here:
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:elevation="0dp">
-        (...)
 ```
 
 ### FragmentContainerView
@@ -193,4 +192,4 @@ Good:
 
 * ViewPager2 glitch with ListAdapter - Calling ```.submitList(newList)``` after data deletion does not properly set
 ```viewPager2.currentItem```. Thus if page transformer is attached page positions displayed are spoiled after the deletion.
-Solved by using simple ```RecyclerView.Adapter```.
+Solved simply by using ```RecyclerView.Adapter```.

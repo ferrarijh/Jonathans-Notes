@@ -22,7 +22,7 @@ import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapt
 import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.PwDialog
 import com.jonathan.trace.study.trace.coketlist.room.Note
-import com.jonathan.trace.study.trace.coketlist.room.NoteViewModel
+import com.jonathan.trace.study.trace.coketlist.viewmodel.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.viewmodel.FragmentStateViewModel
 import kotlinx.android.synthetic.main.fragment_search.*
 

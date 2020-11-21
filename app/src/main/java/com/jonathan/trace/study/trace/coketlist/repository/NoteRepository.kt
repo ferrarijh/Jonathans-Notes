@@ -1,6 +1,10 @@
-package com.jonathan.trace.study.trace.coketlist.room
+package com.jonathan.trace.study.trace.coketlist.repository
 
 import androidx.lifecycle.LiveData
+import com.jonathan.trace.study.trace.coketlist.room.Image
+import com.jonathan.trace.study.trace.coketlist.room.ImageDao
+import com.jonathan.trace.study.trace.coketlist.room.Note
+import com.jonathan.trace.study.trace.coketlist.room.NoteDao
 
 object NoteRepository{
     private var noteDao: NoteDao? = null

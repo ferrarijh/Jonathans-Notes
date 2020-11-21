@@ -2,22 +2,19 @@ package com.jonathan.trace.study.trace.coketlist.viewmodel
 
 import android.app.Activity
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.room.Image
 import com.jonathan.trace.study.trace.coketlist.room.Note
-import com.jonathan.trace.study.trace.coketlist.room.NoteRepository
+import com.jonathan.trace.study.trace.coketlist.repository.NoteRepository
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
@@ -194,7 +191,7 @@ class FragmentStateViewModel: ViewModel(){
         return repository.getImages(noteId)
     }
 
-    /**for SearchFragment**/
+    /** for SearchFragment **/
     val curNotes = MutableLiveData<MutableList<Note>>()
     private var _curNotesAll: LiveData<List<Note>>? = null
     val curNotesAll

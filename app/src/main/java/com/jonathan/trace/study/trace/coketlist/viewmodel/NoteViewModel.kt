@@ -1,4 +1,4 @@
-package com.jonathan.trace.study.trace.coketlist.room
+package com.jonathan.trace.study.trace.coketlist.viewmodel
 
 import android.app.Application
 import android.util.Log
@@ -6,8 +6,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.jonathan.trace.study.trace.coketlist.room.Note
+import com.jonathan.trace.study.trace.coketlist.room.NoteDatabase
+import com.jonathan.trace.study.trace.coketlist.repository.NoteRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -29,22 +31,22 @@ class NoteViewModel (app: Application): AndroidViewModel(app) {
     val getAllNotesByBody: LiveData<List<Note>>
      */
 
-    fun getAllNotes() = repository.getAllNotes()
-    fun getAllTrashNotes() = repository.getAllTrashNotes()
-    fun getAllPrivateNotes() = repository.getAllPrivateNotes()
-    fun getAllNotesByCreated() = repository.getAllNotesByCreated()
-    fun getAllNotesByTitle() = repository.getAllNotesByTitle()
-    fun getAllNotesByBody() = repository.getAllNotesByBody()
-    fun getAllNotesByColor() = repository.getAllNotesByColor()
+    fun getAllNotes() = NoteRepository.getAllNotes()
+    fun getAllTrashNotes() = NoteRepository.getAllTrashNotes()
+    fun getAllPrivateNotes() = NoteRepository.getAllPrivateNotes()
+    fun getAllNotesByCreated() = NoteRepository.getAllNotesByCreated()
+    fun getAllNotesByTitle() = NoteRepository.getAllNotesByTitle()
+    fun getAllNotesByBody() = NoteRepository.getAllNotesByBody()
+    fun getAllNotesByColor() = NoteRepository.getAllNotesByColor()
 
-    fun getIdLastSaved(): LiveData<Int> = repository.getIdLastSaved()
+    fun getIdLastSaved(): LiveData<Int> = NoteRepository.getIdLastSaved()
 
     init {
 
         val noteDao = NoteDatabase.getDatabase(app).getNoteDao()
         val imageDao = NoteDatabase.getDatabase(app).getImageDao()
-        repository.setNoteDao(noteDao)
-        repository.setImageDao(imageDao)
+        NoteRepository.setNoteDao(noteDao)
+        NoteRepository.setImageDao(imageDao)
         Log.d("", "NoteViewModel initialized!")
 /*
         //getAllNotes = repository.getAllNotes()
@@ -58,7 +60,7 @@ class NoteViewModel (app: Application): AndroidViewModel(app) {
 
     fun addNote(note: Note) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addNote(note)
+            NoteRepository.addNote(note)
         }
     }
 
@@ -67,7 +69,7 @@ class NoteViewModel (app: Application): AndroidViewModel(app) {
         val file = File(fullDir)
         file.deleteRecursively()
         viewModelScope.launch(Dispatchers.IO) {
-            repository.delete(note)
+            NoteRepository.delete(note)
         }
     }
 
@@ -84,13 +86,13 @@ class NoteViewModel (app: Application): AndroidViewModel(app) {
                     file.deleteRecursively()
                 }
             }
-            repository.deleteAllTrashed()
+            NoteRepository.deleteAllTrashed()
         }
     }
 
     fun update(note: Note){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.update(note)
+            NoteRepository.update(note)
         }
     }
 
