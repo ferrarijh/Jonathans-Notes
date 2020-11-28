@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
+//import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -129,7 +129,12 @@ class EditNoteFragment: Fragment(){
             data?.data.run{
                 val noteId = nViewModel.getNotePointed()!!.second.id
                 val isNewAndNotSaved = noteId == 0
-                fViewModel.processImageUri(this, requireActivity(), noteId, isNewAndNotSaved)
+                fViewModel.processImageUri(
+                    this,
+                    requireActivity().contentResolver,
+                    requireActivity().filesDir,
+                    noteId,
+                    isNewAndNotSaved)
             }
         }
 
@@ -515,7 +520,7 @@ class EditNoteFragment: Fragment(){
     /** call ONLY when saving unsaved new note**/
     private fun saveNewImagesToDb(noteId: Int){
         CoroutineScope(Dispatchers.Main).launch{
-            val images: LiveData<List<Image>> = fViewModel.saveNewImagesToDb(noteId, requireActivity())
+            val images: LiveData<List<Image>> = fViewModel.saveNewImagesToDb(noteId, requireActivity().filesDir)
             images.observe(viewLifecycleOwner){
 //                submitToAdapter(it as MutableList<Image>)
                 tAdapter.images = it
@@ -539,7 +544,7 @@ class EditNoteFragment: Fragment(){
         }
 
         deleteImageDialog = MyDialog(requireContext(), R.layout.dialog, getString(R.string.delete_image)){
-            fViewModel.deleteImageCallback(requireActivity(), vp_attached_images.currentItem)
+            fViewModel.deleteImageCallback(requireActivity().filesDir, vp_attached_images.currentItem)
             deleteImageDialog.dismiss()
         }
     }
@@ -552,7 +557,7 @@ class EditNoteFragment: Fragment(){
 
     private fun goBack(){
         if(nViewModel.getNotePointed()!!.second.id == 0)
-            fViewModel.deleteNewImages(requireActivity())
+            fViewModel.deleteNewImages(requireActivity().filesDir)
 
         fabSave.hide()
         fabColors.hide()

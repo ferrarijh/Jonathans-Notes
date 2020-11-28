@@ -1,6 +1,7 @@
 package com.jonathan.trace.study.trace.coketlist.viewmodel
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -37,13 +38,13 @@ class FragmentStateViewModel: ViewModel(){
 
     val imagesForNewNote = MutableLiveData<MutableList<Image>>(mutableListOf())
 
-    suspend fun addImages(images: List<Image>) = repository.addImages(images)
+    private suspend fun addImages(images: List<Image>) = repository.addImages(images)
 
     fun setImages(noteId: Int){
         _images = _images ?: repository.getImages(noteId)// as MutableLiveData<List<Image>>
     }
 
-    fun deleteImage(img: Image){
+    private fun deleteImage(img: Image){
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteImage(img)
         }
@@ -53,17 +54,18 @@ class FragmentStateViewModel: ViewModel(){
     val pageIndicator = MutableLiveData("")
 
     /**for EditNoteFragment - image data processing**/
-    fun processImageUri(uri: Uri?, parent: Activity, noteId: Int, isNewAndNotSaved: Boolean){
+    fun processImageUri(uri: Uri?, contentResolver: ContentResolver, filesDir: File, noteId: Int, isNewAndNotSaved: Boolean){
         CoroutineScope(Dispatchers.Default).launch {
             if (uri == null) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(parent, "Something went wrong - null uri :(", Toast.LENGTH_SHORT).show()
-                }
+                Log.d("", "Something went wrong - null uri :(")
+//                withContext(Dispatchers.Main) {
+//                    Toast.makeText(parent, "Something went wrong - null uri :(", Toast.LENGTH_SHORT).show()
+//                }
                 this.cancel()
             }
 
-            val scaledBitmap = parseScaledBitmap(uri!!, parent)
-            val fileName = saveToStorage(scaledBitmap, noteId, parent)
+            val scaledBitmap = parseScaledBitmap(uri!!, contentResolver)
+            val fileName = saveToStorage(scaledBitmap, noteId, filesDir)
 
             if (!isNewAndNotSaved) {
                 val imgProfile = Image(fileName, noteId)
@@ -77,8 +79,8 @@ class FragmentStateViewModel: ViewModel(){
         }
     }
 
-    private fun saveToStorage(bitmap: Bitmap, noteId: Int, parent: Activity): String{
-        val filesDir = parent.filesDir
+    private fun saveToStorage(bitmap: Bitmap, noteId: Int, filesDir: File): String{
+//        val filesDir = parent.filesDir
         val dir = File(filesDir.absolutePath + "/Pictures/$noteId")
         dir.mkdirs()
 
@@ -96,11 +98,11 @@ class FragmentStateViewModel: ViewModel(){
         return fileName
     }
 
-    private fun parseScaledBitmap(uri: Uri, parent: Activity): Bitmap{
+    private fun parseScaledBitmap(uri: Uri, contentResolver: ContentResolver): Bitmap{
 
-        val contentResolver = parent.contentResolver
+//        val contentResolver = parent.contentResolver
         var bitmap = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
-            (ImageDecoder.createSource(contentResolver, uri)).let { ImageDecoder.decodeBitmap(it) }
+                (ImageDecoder.createSource(contentResolver, uri)).let { ImageDecoder.decodeBitmap(it) }
             else MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
         val w = bitmap.width
@@ -118,7 +120,7 @@ class FragmentStateViewModel: ViewModel(){
         return bitmap
     }
 
-    fun deleteImageCallback(parent: Activity, curItemPos: Int){
+    fun deleteImageCallback(filesDir: File, curItemPos: Int){
         val imagePointed = imagePointed!!
         val isNewAndNotSaved = imagePointed.noteId == 0
 
@@ -130,7 +132,7 @@ class FragmentStateViewModel: ViewModel(){
         }else {
             deleteImage(imagePointed)
         }
-        val fullDir = parent.filesDir.absolutePath + "/Pictures/${imagePointed.noteId}"
+        val fullDir = filesDir.absolutePath + "/Pictures/${imagePointed.noteId}"
         val file = File(fullDir, imagePointed.name)
 
         if(file.exists()){
@@ -142,8 +144,8 @@ class FragmentStateViewModel: ViewModel(){
 
     }
 
-    fun deleteNewImages(parent: Activity){
-        val fullPath = parent.filesDir.absolutePath+"/Pictures/0"
+    fun deleteNewImages(filesDir: File){
+        val fullPath = filesDir.absolutePath+"/Pictures/0"
         imagesForNewNote.value!!.forEach{
             val fileName = it.name
             val file = File(fullPath, fileName)
@@ -169,7 +171,7 @@ class FragmentStateViewModel: ViewModel(){
     }
 
     /** call ONLY when saving unsaved new note**/
-    fun saveNewImagesToDb(noteId: Int, parent: Activity): LiveData<List<Image>>{
+    fun saveNewImagesToDb(noteId: Int, filesDir: File): LiveData<List<Image>>{
         val newImages = imagesForNewNote.value!!
         if(newImages.isNotEmpty()) {
             newImages.forEach {
@@ -179,7 +181,7 @@ class FragmentStateViewModel: ViewModel(){
             CoroutineScope(Dispatchers.IO).launch {
                 addImages(newImages)
             }
-            val path = parent.filesDir.absolutePath + "/Pictures"
+            val path = filesDir.absolutePath + "/Pictures"
             val oldDir = File(path, "0")
             val newDir = File(path, noteId.toString())
             if (oldDir.renameTo(newDir))

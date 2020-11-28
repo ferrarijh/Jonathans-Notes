@@ -47,14 +47,9 @@ class HomeFragment : Fragment() {
     private val parent by lazy{requireActivity() as AppCompatActivity}
 
     private val appear: Animation by lazy{ AnimationUtils.loadAnimation(context, R.anim.btn_appear)}
-    private val disappear: Animation by lazy{ AnimationUtils.loadAnimation(
-        context,
-        R.anim.global_disappear
-    )}
+    private val disappear: Animation by lazy{ AnimationUtils.loadAnimation(context, R.anim.global_disappear)}
 
-    private val sharedPreference by lazy {
-        parent.getSharedPreferences("Sort", Context.MODE_PRIVATE)
-    }
+    private val sharedPreference by lazy { parent.getSharedPreferences("Sort", Context.MODE_PRIVATE) }
 
     private val spEditor by lazy{sharedPreference.edit()}
 
