@@ -40,9 +40,9 @@ class ThumbnailAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (viewHolderType){
-            HOME->(holder as ThumbnailViewHolder).bind(thumbnails[position], position, listener, longListener)
-            PRIVATE->(holder as ThumbnailPrivateViewHolder).bind(thumbnails[position], position, listener, longListener)
-            TRASH-> (holder as ThumbnailTrashViewHolder).bind(thumbnails[position], position, listener, longListener)
+            HOME->(holder as ThumbnailViewHolder).bind(thumbnails[position], listener, longListener)
+            PRIVATE->(holder as ThumbnailPrivateViewHolder).bind(thumbnails[position], listener, longListener)
+            TRASH-> (holder as ThumbnailTrashViewHolder).bind(thumbnails[position], listener, longListener)
             else -> throw Exception("Unknown ViewHolder type")
         }
     }

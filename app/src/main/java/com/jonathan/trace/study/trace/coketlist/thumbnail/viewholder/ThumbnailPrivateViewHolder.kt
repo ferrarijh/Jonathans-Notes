@@ -21,8 +21,7 @@ class ThumbnailPrivateViewHolder(
     private val nViewModel: NoteViewModel
             by lazy{ ViewModelProvider(itemView.context as ViewModelStoreOwner).get(NoteViewModel::class.java)}
 
-    //parem position: for future updates for multi selection
-    fun bind(note: Note, position: Int, clickListener: ThumbnailAdapter.ThumbnailAdapterListener, longClickListener: ThumbnailAdapter.ThumbnailAdapterLongListener){
+    fun bind(note: Note, clickListener: ThumbnailAdapter.ThumbnailAdapterListener, longClickListener: ThumbnailAdapter.ThumbnailAdapterLongListener){
 
         val curDate = getDateTime().substring(0, 10)
         val noteDate = note.dateTimeModified.substring(0, 10)

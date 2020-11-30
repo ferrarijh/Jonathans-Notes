@@ -27,7 +27,7 @@ class ThumbnailViewHolder(
     private val disappear by lazy{AnimationUtils.loadAnimation(itemView.context, R.anim.global_disappear)}
     private val appear by lazy{AnimationUtils.loadAnimation(itemView.context, R.anim.btn_appear)}
 
-    fun bind(note: Note, position: Int, clickListener: ThumbnailAdapter.ThumbnailAdapterListener, longClickListener: ThumbnailAdapter.ThumbnailAdapterLongListener){
+    fun bind(note: Note, clickListener: ThumbnailAdapter.ThumbnailAdapterListener, longClickListener: ThumbnailAdapter.ThumbnailAdapterLongListener){
         val curDate = getDateTime().substring(0, 10)
         val noteDate = note.dateTimeModified.substring(0, 10)
         var displayDate = if(curDate == noteDate)
@@ -48,7 +48,7 @@ class ThumbnailViewHolder(
             iv_cover.visibility = View.GONE
             iv_checkbox.visibility = View.GONE
 
-            if(nViewModel.selected[position] != null)
+            if(nViewModel.selected[layoutPosition] != null)
                 setBackgroundToSel()
 
             nViewModel.selMode.observe(context as LifecycleOwner){

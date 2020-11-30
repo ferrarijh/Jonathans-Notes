@@ -1,4 +1,8 @@
-# ROOM DB-Repository-ViewModel pattern
+# Jonathan's Notes for Android
+
+Jonathan's Notes is note/diary app for Android.
+
+## RoomDB-Repository-ViewModel pattern
 
 app architecture guide:
 https://developer.android.com/jetpack/guide?hl=ko
@@ -53,13 +57,13 @@ Here,
 * when multiple views are not interacting each other there's no need to use LiveData. (UNLESS you want to recover view states on rotation)
 
 ### Extra
-* when updating collection of instance in adapter class with another list wrapped with LiveData container,
+* when updating collection of instances in adapter class with another list wrapped with LiveData container,
 be aware that this new list should be handled asynchronously.
 Thus, below code will trigger NullPointerException.
 
 Bad:
 ```kotlin
-    val newListLive = myViewModel.getUsers()    //fetched from ROOM DB
+    val newListLive: LiveData<List<User>> = myViewModel.getUsers()    //fetched from ROOM DB
     myAdapter.submitList(newListLive.value!!)    //NO NO!
 ```
 
@@ -70,7 +74,7 @@ The right way to do is at below.
 
 Good:
 ```kotlin
-    val newListLive = myViewModel.gerUsers()
+    val newListLive: LiveData<List<User>> = myViewModel.gerUsers()
     newListLive.observe(viewLifeCycleOwner){
         adapter.submitList(it)
     }
@@ -121,7 +125,7 @@ How it's done here:
 ```app:contentInsetStart="0dp"```
 
 * To disable shadow below toolbar, set ```app:elevation="0dp"``` in AppBarLayout like below.
-```xml
+```
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -173,14 +177,15 @@ By default window is whole screen for app. (area except notification bar and bot
 * ```fillAfter=true``` unnecessary if the animation is 'hiding' type of animation and target view's default visibility is ```visibility="invisible"``` in XML.
 
 # Furthermore..
-* Iterating through Collection without iterators to remove entry will trigger ConcurrentModificationException.
+* Iterating through Collection without iterators to remove entry will trigger `ConcurrentModificationException`.
 
-Bad: (will trigger ConcurrentModificationException)
+Bad: (will trigger `ConcurrentModificationException`)
 ```kotlin
     myMap.forEach{
         myMap.remove(it.key)
     }
 ```
+
 Good:
 ```kotlin
     val iter = myMap.iterator()
@@ -193,5 +198,3 @@ Good:
 * ViewPager2 glitch with ListAdapter - Calling ```.submitList(newList)``` after data deletion does not properly set
 ```viewPager2.currentItem```. Thus if page transformer is attached page positions displayed are spoiled after the deletion.
 Solved simply by using ```RecyclerView.Adapter```.
-
-TEST CHANGE FROM NEW PC
