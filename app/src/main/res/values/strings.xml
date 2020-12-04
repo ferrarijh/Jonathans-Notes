@@ -73,8 +73,8 @@
 
     <string name="deleted_perma">노트를 삭제했습니다</string>
     <string name="cleared" translatable="false">🧹🧼🧹🧼</string>
-    <string name="title">제목</string>
-    <string name="body">내용을 입력하세요</string>
+    <string name="title"><i>제목</i></string>
+    <string name="body"><i>내용을 입력하세요</i></string>
 
     <string name="lock_removed">잠금을 없앴습니다</string>
 
@@ -82,6 +82,6 @@
 
     <string name="note_recovered">복원!</string>
 
-    <string name="fetching_image">사진을 가져오는중이에요..</string>
+    <string name="fetching_image"><i>사진을 가져오고있습니다…</i></string>
 
 </resources>

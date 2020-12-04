@@ -43,15 +43,15 @@
     <string name="invalid_pw_note">Invaild password</string>
     <string name="warn_blank_pw">Please fill both boxes</string>
     <string name="deleted_perma">Note deleted</string>
-    <string name="title">Title</string>
-    <string name="body">Body</string>
+    <string name="title"><i>Title</i></string>
+    <string name="body"><i>Body</i></string>
     <string name="multi_sel">Multi-select</string>
     <string name="warn_delete_multi">Move selected notes to trash can?</string>
     <string name="remove_lock">Remove Lock</string>
     <string name="lock_removed">Lock removed</string>
     <string name="nothing_to_delete">Nothing selected to delete</string>
     <string name="note_recovered">Recovered!</string>
-    <string name="fetching_image">Fetching image..</string>
+    <string name="fetching_image"><i>Fetching image…</i></string>
     <string name="delete_image">Delete image?</string>
     <string name="saved_onclick">Saved! (long press to save and exit)</string>
 </resources>
