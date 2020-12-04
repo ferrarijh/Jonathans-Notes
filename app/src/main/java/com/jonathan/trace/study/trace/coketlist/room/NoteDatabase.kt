@@ -28,7 +28,7 @@ abstract class NoteDatabase: RoomDatabase(){
                     "CREATE TABLE IF NOT EXISTS image_table(noteId INTEGER NOT NULL, name VARCHAR NOT NULL, PRIMARY KEY(name), FOREIGN KEY(noteId) REFERENCES note_table(id) ON DELETE CASCADE)"
                 )
                 database.execSQL(
-                    "CREATE INDEX index_image_table_noteId ON image_table(noteId)"
+                    "CREATE INDEX IF NOT EXISTS index_image_table_noteId ON image_table(noteId)"
                 )
             }
         }

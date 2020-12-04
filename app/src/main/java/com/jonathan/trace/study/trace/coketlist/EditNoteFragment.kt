@@ -1,6 +1,7 @@
 package com.jonathan.trace.study.trace.coketlist
 
 import android.Manifest
+import android.animation.AnimatorSet
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
@@ -29,11 +30,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.jonathan.trace.study.trace.coketlist.adapter.ViewPagerAdapterTest
+import com.jonathan.trace.study.trace.coketlist.viewpager.adapter.ViewPagerAdapter
 import com.jonathan.trace.study.trace.coketlist.dialog.MyDialog
 import com.jonathan.trace.study.trace.coketlist.dialog.fragment.ImageViewFragment
 import com.jonathan.trace.study.trace.coketlist.room.Image
 import com.jonathan.trace.study.trace.coketlist.room.Note
+import com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder.DateConverter.Companion.getDateTime
 import com.jonathan.trace.study.trace.coketlist.viewmodel.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.viewmodel.FragmentStateViewModel
 import kotlinx.android.synthetic.main.fragment_edit_note.*
@@ -58,7 +60,7 @@ class EditNoteFragment: Fragment(){
     private val isPaletteOpen = MutableLiveData<Boolean>()
     private var justInitialized = true
 //    private val vAdapter by lazy {ViewPagerAdapter(imageViewer, this){deleteImageDialog.show(); true} }
-    private val tAdapter by lazy{ ViewPagerAdapterTest(fViewModel.images?.value, imageViewer, this){deleteImageDialog.show(); true} }
+    private val vAdapter by lazy{ ViewPagerAdapter(fViewModel.images?.value, imageViewer, this){deleteImageDialog.show(); true} }
     private val imageViewer: ImageViewFragment by lazy{ImageViewFragment()}
     private lateinit var deleteImageDialog : MyDialog
 
@@ -79,6 +81,7 @@ class EditNoteFragment: Fragment(){
     private val up: Animation by lazy { AnimationUtils.loadAnimation(context, R.anim.fab_up)}
     private val down: Animation by lazy { AnimationUtils.loadAnimation(context, R.anim.fab_down)}
     private val init: Animation by lazy { AnimationUtils.loadAnimation(context, R.anim.fab_init)}
+    private val flicker: Animation by lazy {AnimationUtils.loadAnimation(context, R.anim.flicker)}
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -143,8 +146,7 @@ class EditNoteFragment: Fragment(){
 
     private fun setViewPager(){
         vp_attached_images.apply{
-//            adapter = vAdapter
-            adapter = tAdapter
+            adapter = vAdapter
             offscreenPageLimit = 2
 
             val screenWidth = resources.displayMetrics.widthPixels
@@ -163,8 +165,7 @@ class EditNoteFragment: Fragment(){
 
             registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
                 override fun onPageSelected(position: Int) {
-//                    fViewModel.setPageIndicator(vAdapter.itemCount, vp_attached_images.currentItem)
-                    fViewModel.setPageIndicator(tAdapter.itemCount, vp_attached_images.currentItem)
+                    fViewModel.setPageIndicator(vAdapter.itemCount, vp_attached_images.currentItem)
                 }
             })
         }
@@ -183,15 +184,15 @@ class EditNoteFragment: Fragment(){
                 fViewModel.setImages(noteId)
                 fViewModel.images!!.observe(viewLifecycleOwner) {
 //                    vAdapter.submitList(it)
-                    tAdapter.images = it
-                    tAdapter.notifyDataSetChanged()
+                    vAdapter.images = it
+                    vAdapter.notifyDataSetChanged()
                     fViewModel.setPageIndicator(it.size, vp_attached_images.currentItem)
                 }
             }
         }else{
 //            vAdapter.submitList(fViewModel.imagesForNewNote.value)
-            tAdapter.images = fViewModel.imagesForNewNote.value
-            tAdapter.notifyDataSetChanged()
+            vAdapter.images = fViewModel.imagesForNewNote.value
+            vAdapter.notifyDataSetChanged()
         }
     }
 
@@ -203,6 +204,8 @@ class EditNoteFragment: Fragment(){
                 val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
                 requestPermissions(permissions, REQUEST_CODE_FETCH)
             }
+
+            frame_ib.startAnimation(flicker)
         }
     }
 
@@ -349,14 +352,14 @@ class EditNoteFragment: Fragment(){
             fViewModel.setImages(noteId)
             fViewModel.images!!.observe(viewLifecycleOwner){
 //                submitToAdapter(it as MutableList<Image>)
-                tAdapter.images = it
-                tAdapter.notifyDataSetChanged()
+                vAdapter.images = it
+                vAdapter.notifyDataSetChanged()
             }
         }else{
             fViewModel.imagesForNewNote.observe(viewLifecycleOwner){
 //                submitToAdapter(it)
-                tAdapter.images = it
-                tAdapter.notifyDataSetChanged()
+                vAdapter.images = it
+                vAdapter.notifyDataSetChanged()
                 fViewModel.setPageIndicator(it.size, vp_attached_images.currentItem)
             }
         }
@@ -523,8 +526,8 @@ class EditNoteFragment: Fragment(){
             val images: LiveData<List<Image>> = fViewModel.saveNewImagesToDb(noteId, requireActivity().filesDir)
             images.observe(viewLifecycleOwner){
 //                submitToAdapter(it as MutableList<Image>)
-                tAdapter.images = it
-                tAdapter.notifyDataSetChanged()
+                vAdapter.images = it
+                vAdapter.notifyDataSetChanged()
             }
             fViewModel.imagesForNewNote.removeObservers(viewLifecycleOwner)
         }
@@ -547,12 +550,6 @@ class EditNoteFragment: Fragment(){
             fViewModel.deleteImageCallback(requireActivity().filesDir, vp_attached_images.currentItem)
             deleteImageDialog.dismiss()
         }
-    }
-
-    private fun getDateTime(): String{
-        val date = Calendar.getInstance().time
-        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        return formatter.format(date)
     }
 
     private fun goBack(){

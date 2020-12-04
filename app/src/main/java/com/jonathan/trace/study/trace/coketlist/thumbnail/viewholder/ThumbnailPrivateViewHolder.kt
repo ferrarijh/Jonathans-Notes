@@ -10,6 +10,7 @@ import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.viewmodel.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
+import com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder.DateConverter.Companion.getDateTime
 import kotlinx.android.synthetic.main.thumbnail_private.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,11 +48,5 @@ class ThumbnailPrivateViewHolder(
                 true
             }
         }
-    }
-
-    private fun getDateTime(): String{
-        val date = Calendar.getInstance().time
-        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        return formatter.format(date)
     }
 }

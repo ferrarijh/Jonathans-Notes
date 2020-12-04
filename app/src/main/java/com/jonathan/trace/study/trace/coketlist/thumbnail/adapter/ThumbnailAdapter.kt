@@ -13,6 +13,7 @@ import com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder.ThumbnailTr
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ThumbnailAdapter(
     private var thumbnails: MutableList<Note> = mutableListOf<Note>(),
@@ -59,16 +60,25 @@ class ThumbnailAdapter(
 
     fun updateList(newList: List<Note>) {
         val callback = ListDiffCallback(thumbnails, newList)
-        var diffResult : DiffUtil.DiffResult? = null
-        CoroutineScope(Dispatchers.Default).launch {
-            diffResult = DiffUtil.calculateDiff(callback)    //this is 'expensive', so call it in worker thread
-        }.invokeOnCompletion {
-            CoroutineScope(Dispatchers.Main).launch{
-                //thumbnails = newList    //this will NOT dynamically update search fragment
-                thumbnails.clear()
-                thumbnails.addAll(newList)
-                diffResult?.dispatchUpdatesTo(this@ThumbnailAdapter)
-            }
+//        var diffResult : DiffUtil.DiffResult? = null
+//        CoroutineScope(Dispatchers.Default).launch {
+//            diffResult = DiffUtil.calculateDiff(callback)    //this is 'expensive', so call it in worker thread
+//        }.invokeOnCompletion {
+//            CoroutineScope(Dispatchers.Main).launch{
+//                //thumbnails = newList    //this will NOT dynamically update search fragment
+//                thumbnails.clear()
+//                thumbnails.addAll(newList)
+//                diffResult?.dispatchUpdatesTo(this@ThumbnailAdapter)
+//            }
+//        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val diffResult = withContext(Dispatchers.Default){
+                DiffUtil.calculateDiff(callback)
+            }    //this is 'expensive', so call it in worker thread
+            thumbnails.clear()
+            thumbnails.addAll(newList)
+            diffResult.dispatchUpdatesTo(this@ThumbnailAdapter)
         }
     }
 

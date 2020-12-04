@@ -1,4 +1,4 @@
-package com.jonathan.trace.study.trace.coketlist.adapter
+package com.jonathan.trace.study.trace.coketlist.viewpager.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,26 +8,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.dialog.fragment.ImageViewFragment
 import com.jonathan.trace.study.trace.coketlist.room.Image
+import com.jonathan.trace.study.trace.coketlist.viewpager.viewholder.PageViewHolder
 
-class ViewPagerAdapterTest(
+class ViewPagerAdapter(
     var images: List<Image>?,
     private val imageViewer: ImageViewFragment,
     private val fragment: Fragment,
     private val longClickListener: View.OnLongClickListener
-): RecyclerView.Adapter<ViewPagerAdapter.PageViewHolder>() {
+): RecyclerView.Adapter<PageViewHolder>() {
 
     init{
         if (images == null)
             images = listOf()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewPagerAdapter.PageViewHolder =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageViewHolder =
         with(LayoutInflater.from(parent.context)){
             val view = this.inflate(R.layout.item_viewpager, parent, false)
-            ViewPagerAdapter.PageViewHolder(view, fragment, longClickListener)
+            PageViewHolder(view, fragment, longClickListener)
         }
 
-    override fun onBindViewHolder(holder: ViewPagerAdapter.PageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PageViewHolder, position: Int) {
         holder.bind(images!![position], imageViewer)
     }
 

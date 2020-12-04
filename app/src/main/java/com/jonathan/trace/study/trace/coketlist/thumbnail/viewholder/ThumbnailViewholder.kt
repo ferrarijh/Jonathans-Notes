@@ -12,6 +12,10 @@ import com.jonathan.trace.study.trace.coketlist.R
 import com.jonathan.trace.study.trace.coketlist.room.Note
 import com.jonathan.trace.study.trace.coketlist.viewmodel.NoteViewModel
 import com.jonathan.trace.study.trace.coketlist.thumbnail.adapter.ThumbnailAdapter
+import com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder.DateConverter.Companion.PATTERN_DATE_ONLY
+import com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder.DateConverter.Companion.PATTERN_TIME_ONLY
+import com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder.DateConverter.Companion.convertDateRawString
+import com.jonathan.trace.study.trace.coketlist.thumbnail.viewholder.DateConverter.Companion.getDateTime
 import kotlinx.android.synthetic.main.thumbnail.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,9 +35,11 @@ class ThumbnailViewHolder(
         val curDate = getDateTime().substring(0, 10)
         val noteDate = note.dateTimeModified.substring(0, 10)
         var displayDate = if(curDate == noteDate)
-            note.dateTimeModified.substring(11)
+//            note.dateTimeModified.substring(11)
+            convertDateRawString(note.dateTimeModified, PATTERN_TIME_ONLY)
         else
-            noteDate.substring(5) + '-' + noteDate.substring(0,4)
+            convertDateRawString(note.dateTimeModified, PATTERN_DATE_ONLY)
+//            noteDate.substring(5) + '-' + noteDate.substring(0,4)
 
         displayDate += " "
 
@@ -99,9 +105,5 @@ class ThumbnailViewHolder(
         }
     }
 
-    private fun getDateTime(): String{
-        val date = Calendar.getInstance().time
-        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        return formatter.format(date)
-    }
+
 }
