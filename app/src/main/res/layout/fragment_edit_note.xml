@@ -25,28 +25,19 @@
         android:textColor="@color/icons"
         android:textSize="10sp"
         android:layout_gravity="center"/>
-    <FrameLayout
-        android:id="@+id/frame_ib"
-        android:alpha="0.8"
-        android:layout_width="60dp"
-        android:layout_height="40dp"
+
+    <ImageView
+        android:id="@+id/iv_bookmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="60dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/bookmark_w200"
         android:layout_gravity="end"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/bookmark"
+        android:layout_marginBottom="-3dp"
         android:elevation="2dp"
-        android:layout_marginBottom="-4dp"
-        android:clickable="true"
-        android:focusable="true">
-        <ImageButton
-            android:id="@+id/ib_attach_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="5dp"
-            android:paddingBottom="2dp"
-            android:src="@drawable/ic_image"
-            android:background="@android:color/transparent"/>
-    </FrameLayout>
+        android:alpha="0.9"/>
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_edit_note"
         android:layout_width="match_parent"

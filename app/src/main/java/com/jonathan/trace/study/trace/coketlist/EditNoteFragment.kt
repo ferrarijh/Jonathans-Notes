@@ -197,7 +197,8 @@ class EditNoteFragment: Fragment(){
     }
 
     private fun setImageButton(){
-        ib_attach_image.setOnClickListener{
+//        ib_attach_image
+        iv_bookmark.setOnClickListener{
             if(checkPermission())
                 attachImage()
             else {
@@ -205,7 +206,9 @@ class EditNoteFragment: Fragment(){
                 requestPermissions(permissions, REQUEST_CODE_FETCH)
             }
 
-            frame_ib.startAnimation(flicker)
+//            it.startAnimation(flicker)
+//            iv_bookmark.startAnimation(flicker)
+            it.startAnimation(flicker)
         }
     }
 
