@@ -1,6 +1,7 @@
 # Jonathan's Notes for Android
 
 Jonathan's Notes is note/diary app for Android.
+(playstore: https://play.google.com/store/apps/details?id=com.jonathan.jonathans.notes)
 
 ## RoomDB-Repository-ViewModel pattern
 
